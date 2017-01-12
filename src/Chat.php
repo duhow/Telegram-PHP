@@ -1,6 +1,6 @@
 <?php
 
-namespace Telegram\Elements;
+namespace Telegram;
 
 class Chat extends User {
 	public $title;

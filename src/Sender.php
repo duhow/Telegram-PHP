@@ -1,8 +1,7 @@
 <?php
 
 namespace Telegram;
-use Telegram\Keyboard;
-use Telegram\InlineKeyboard;
+use Telegram\Elements; // TODO
 
 class Sender {
 	private $parent;
@@ -13,8 +12,8 @@ class Sender {
 	private $_inline;
 
 	function __construct($uid = NULL, $key = NULL, $name = NULL){
-		$this->_keyboard = new Keyboard($this);
-		$this->_inline = new InlineKeyboard($this);
+		$this->_keyboard = new Keyboards\Keyboard($this);
+		$this->_inline = new Keyboards\InlineKeyboard($this);
 
 		if(!empty($uid)){
 			if($uid instanceof Receiver){

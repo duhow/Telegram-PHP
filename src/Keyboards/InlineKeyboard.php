@@ -1,6 +1,6 @@
 <?php
 
-namespace Telegram\Elements\Keyboard;
+namespace Telegram\Keyboards;
 
 class InlineKeyboard {
 	private $rows;

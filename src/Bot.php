@@ -1,6 +1,6 @@
 <?php
 
-namespace Telegram\Elements;
+namespace Telegram;
 
 class Bot extends User {
 	public $key = NULL;

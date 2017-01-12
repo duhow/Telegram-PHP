@@ -1,12 +1,13 @@
 <?php
 
-namespace Telegram\Elements;
+namespace Telegram;
 
 class User {
 	public $id = NULL;
 	public $first_name = NULL;
 	public $last_name = NULL;
 	public $username = NULL;
+	protected $bot;
 	protected $extra = array();
 
 	function __construct($id, $first_name = NULL, $last_name = NULL, $username = NULL){
@@ -14,6 +15,10 @@ class User {
 			foreach($id as $k => $v){
 				$$k = $v;
 			}
+		}
+
+		if($first_name instanceof Bot){
+			$this->bot = $first_name;
 		}
 
 		$this->id = intval($id);
@@ -29,7 +34,8 @@ class User {
 		// and save to self variable
 	}
 
-	function info($bot){
+	function info($bot = NULL){
+		if(!empty($this->bot) && empty($bot)){ $bot = $this->bot;}
 		$send = new Sender($bot);
 		$info = $send->get_chat($this->id);
 		return $this->__construct($info);
