@@ -2,6 +2,7 @@
 
 Another library to use Telegram bots with PHP.
 
+- Include the **src/Autoloader.php** file.
 - Create a *Telegram\Bot* object.
 - Create a *Telegram\Receiver* object using the *$bot*.
 
