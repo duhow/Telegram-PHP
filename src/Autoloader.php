@@ -10,11 +10,12 @@ $files = [
 	$dir .'Keyboards/InlineKeyboard.php',
 
 	$dir .'Elements/Base.php',
+	$dir .'Elements/Voice.php', // REQUIRED for priority
 ];
 
 foreach(scandir($dir .'Elements/') as $file){
-	if(strpos($file, -4) != ".php"){ continue; }
-	$files[] = $file;
+	if(substr($file, -4) != ".php"){ continue; }
+	$files[] = $dir .'Elements/' .$file;
 }
 
 $files[] = $dir .'Receiver.php';

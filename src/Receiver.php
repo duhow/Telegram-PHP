@@ -93,7 +93,7 @@ class Receiver {
 				}
 				if(isset($this->data[$this->key]['entities'])){
 					foreach($this->data[$this->key]['entities'] as $ent){
-						$this->entities[] = new MessageEntity($ent, $this->text());
+						$this->entities[] = new Elements\MessageEntity($ent, $this->text());
 					}
 				}
 			}elseif(isset($this->data['callback_query'])){
