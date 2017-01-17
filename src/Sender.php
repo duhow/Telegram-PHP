@@ -12,8 +12,8 @@ class Sender {
 	private $_inline;
 
 	function __construct($uid = NULL, $key = NULL, $name = NULL){
-		$this->_keyboard = new Keyboards\Keyboard($this);
-		$this->_inline = new Keyboards\InlineKeyboard($this);
+		$this->_keyboard = new \Telegram\Keyboards\Keyboard($this);
+		$this->_inline = new \Telegram\Keyboards\InlineKeyboard($this);
 
 		if(!empty($uid)){
 			if($uid instanceof Receiver){
@@ -28,12 +28,12 @@ class Sender {
 	}
 
 	function set_access($uid, $key = NULL, $name = NULL){
-		$this->bot = new Bot($uid, $key, $name);
+		$this->bot = new \Telegram\Bot($uid, $key, $name);
 		return $this;
 	}
 
 	function chat($id = NULL){
-		if($id === TRUE && $this->parent instanceof Receiver){ $id = $this->parent->chat->id; }
+		if($id === TRUE && $this->parent instanceof \Telegram\Receiver){ $id = $this->parent->chat->id; }
 		$this->content['chat_id'] = $id;
 		return $this;
 	}
@@ -46,7 +46,7 @@ class Sender {
 
 	function message($id = NULL){
 		if(empty($id)){ return $this->content['message_id']; }
-		if($id === TRUE && $this->parent instanceof Receiver){ $id = $this->parent->message; }
+		if($id === TRUE && $this->parent instanceof \Telegram\Receiver){ $id = $this->parent->message; }
 		$this->content['message_id'] = $id;
 		return $this;
 	}
@@ -71,7 +71,7 @@ class Sender {
 
 		$this->method = "send" .ucfirst($type);
 		if(file_exists(realpath($file))){
-			$this->content[$type] = new CURLFile(realpath($file));
+			$this->content[$type] = new \CURLFile(realpath($file));
 		}else{
 			$this->content[$type] = $file;
 		}
@@ -360,7 +360,7 @@ class Sender {
 			$response = json_decode($response, true);
 			error_log("Request has failed with error {$response['error_code']}: {$response['description']}\n");
 			if ($http_code == 401) {
-				throw new Exception('Invalid access token provided');
+				throw new \Exception('Invalid access token provided');
 			}
 			return false;
 		} else {
