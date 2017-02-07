@@ -24,13 +24,15 @@ class Receiver {
 	public $bot = array();
 	public $key = NULL;
 	public $id = NULL;
-	public $message = NULL;
+	public $message = NULL; // DEPRECATED
 	public $message_id = NULL;
 	public $chat = NULL;
 	public $user = NULL;
 	public $entities = NULL;
 	public $reply = NULL;
 	public $new_user = NULL;
+	public $new_users = array();
+	public $left_user = NULL;
 	public $reply_user = NULL;
 	public $has_reply = FALSE;
 	public $has_forward = FALSE;
@@ -86,10 +88,19 @@ class Receiver {
 				if(isset($this->data[$this->key]['forward_from_chat'])){
 					$this->has_forward = TRUE;
 				}
-				if(isset($this->data[$this->key]['new_chat_participant'])){
-					$this->new_user = new User($this->data[$this->key]['new_chat_participant']);
-				}elseif(isset($this->data[$this->key]['left_chat_participant'])){
-					$this->new_user = new User($this->data[$this->key]['left_chat_participant']);
+				if(isset($this->data[$this->key]['new_chat_members'])){
+					foreach($this->data[$this->key]['new_chat_members'] as $user){
+						$this->new_users[] = new User($user);
+					}
+					$this->new_user = $this->new_users[0]; // COMPATIBILITY: Tal y como hace Telegram, se agrega el primer usuario.
+				// DEPRECTAED en un futuro?
+				}elseif(isset($this->data[$this->key]['new_chat_member'])){
+					$this->new_user = new User($this->data[$this->key]['new_chat_member']);
+					$this->new_users = [$this->new_user];
+				}elseif(isset($this->data[$this->key]['left_chat_member'])){
+					// DEPRECATED
+					$this->new_user = new User($this->data[$this->key]['left_chat_member']);
+					$this->left_user = $this->new_user;
 				}
 				if(isset($this->data[$this->key]['entities'])){
 					foreach($this->data[$this->key]['entities'] as $ent){
@@ -343,8 +354,11 @@ class Receiver {
 
 	function is_chat_group(){ return isset($this->chat->type) && in_array($this->chat->type, ["group", "supergroup"]); }
 	function data_received($expect = NULL){
-		$data = ["migrate_to_chat_id", "migrate_from_chat_id", "new_chat_participant", "left_chat_participant", "new_chat_member", "left_chat_member", "reply_to_message",
-			"text", "audio", "document", "photo", "voice", "location", "contact"];
+		$data = [
+			"migrate_to_chat_id", "migrate_from_chat_id",
+			"new_chat_participant", "left_chat_participant", "new_chat_members", "new_chat_member", "left_chat_member",
+			"reply_to_message", "text", "audio", "document", "photo", "voice", "location", "contact"
+		];
 		foreach($data as $t){
 			if(isset($this->data["message"][$t])){
 				if($expect == NULL or $expect == $t){ return $t; }
