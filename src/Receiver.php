@@ -354,13 +354,16 @@ class Receiver {
 
 	function is_chat_group(){ return isset($this->chat->type) && in_array($this->chat->type, ["group", "supergroup"]); }
 	function data_received($expect = NULL){
+		if($expect !== NULL){
+			return (isset($this->data[$this->key][$expect]));
+		}
 		$data = [
 			"migrate_to_chat_id", "migrate_from_chat_id",
 			"new_chat_participant", "left_chat_participant", "new_chat_members", "new_chat_member", "left_chat_member",
 			"reply_to_message", "text", "audio", "document", "photo", "voice", "location", "contact"
 		];
 		foreach($data as $t){
-			if(isset($this->data["message"][$t])){
+			if(isset($this->data[$this->key][$t])){
 				if($expect == NULL or $expect == $t){ return $t; }
 			}
 		}
