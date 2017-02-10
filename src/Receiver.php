@@ -473,6 +473,7 @@ class Receiver {
 		if(empty($photos)){ return FALSE; }
 		// Select last file or $sel_id
 		$sel = ($sel == -1 or ($sel > count($photos) - 1) ? (count($photos) - 1) : $sel);
+		if(!isset($photos[$sel])){ $sel = 0; } // TEMP FIX
 		if($retall === FALSE){ return $photos[$sel]['file_id']; }
 		elseif($retall === TRUE){ return (object) $photos[$sel]; }
 	}
