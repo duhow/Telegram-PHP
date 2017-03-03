@@ -169,6 +169,7 @@ class Receiver {
 		$input = strtolower($input); // HACK util o molesto en segun que casos?
 		$input = str_replace(["á", "é", "í", "ó", "ú"], ["a", "e", "i", "o", "u"], $input); // HACK mas de lo mismo, ayuda o molesta?
 		$input = str_replace(["Á", "É", "Í", "Ó", "Ú"], ["A", "E", "I", "O", "U"], $input); // HACK
+		$input = str_replace("%20", " ", $input); // HACK web
 		$input = strtolower($input);
         $input = str_replace("/", "\/", $input); // CHANGED fix para escapar comandos y demás.
 
@@ -183,12 +184,15 @@ class Receiver {
             $next_word = str_replace("/", "\/", $next_word); // CHANGED
 		}
 
+		// Al principio de frase
 		if($position === TRUE){
 			if($next_word === NULL){ $regex = "^(" .$input .')([\s!.,"]?)'; }
 			else{ $regex = "^(" .$input .')([\s!.,"]?)\s(' .$next_word .')([\s!?.,"]?)'; }
+		// Al final de frase
 		}elseif($position === FALSE){
 			if($next_word === NULL){ $regex = "(" .$input .')([!?,."]?)$'; }
 			else{ $regex = "(" .$input .')([\s!.,"]?)\s(' .$next_word .')([?!.,"]?)$'; }
+		// En cualquier posición
 		}else{
 			if($next_word === NULL){ $regex = "(" .$input .')([\s!?.,"])|(' .$input .')$'; }
 			else{ $regex = "(" .$input .')([\s!.,"]?)\s(' .$next_word .')([\s!?.,"])|(' .$input .')([\s!.,"]?)\s(' .$next_word .')([!?.,"]?)$'; }
@@ -197,8 +201,9 @@ class Receiver {
 		$text = strtolower($this->text());
 		$text = str_replace(["á", "é", "í", "ó", "ú"], ["a", "e", "i", "o", "u"], $text); // HACK
 		$text = str_replace(["Á", "É", "Í", "Ó", "Ú"], ["A", "E", "I", "O", "U"], $text); // HACK
+		$text = str_replace("%20", " ", $text); // HACK web
 		$text = strtolower($text);
-		return preg_match("/" .$regex ."/", $text);
+		return preg_match("/$regex/", $text);
 	}
 
 	function text_mention($user = NULL){
@@ -265,15 +270,19 @@ class Receiver {
 		}
 		if($cmd == NULL){ return (count($cmds) > 0 ? $cmds[0] : FALSE); }
 		if($cmd === TRUE){ return $cmds; }
-		if(is_string($cmd)){
-			if($cmd[0] != "/"){ $cmd = "/" .$cmd; }
-			if(in_array(strtolower($cmd), $cmds) && strpos($cmd, "@") === FALSE){ return TRUE; }
-			$name = $this->bot->username;
-			if($name){
-				if($name[0] != "@"){ $name = "@" .$name; }
-				$cmd = $cmd.$name;
+		if(is_string($cmd)){ $cmd = [$cmd]; }
+		if(is_array($cmd)){
+			foreach($cmd as $csel){
+				if($csel[0] != "/"){ $csel = "/" .$csel; }
+				$csel = strtolower($csel);
+				if(in_array($csel, $cmds) && strpos($csel, "@") === FALSE){ return TRUE; }
+				$name = $this->bot->username;
+				if($name){
+					if($name[0] != "@"){ $name = "@" .$name; }
+					$csel = $csel.$name;
+				}
+				if(in_array($csel, $cmds)){ return TRUE; }
 			}
-			return in_array(strtolower($cmd), $cmds);
 		}
 		return FALSE;
 	}
@@ -312,7 +321,7 @@ class Receiver {
 	}
 
 	function last_word($clean = FALSE){
-		$text = explode(" ", $this->text());
+		$text = $this->words(TRUE);
 		if($clean === TRUE){ $clean = 'alphanumeric-accent'; }
 		return $this->clean($clean, array_pop($text));
 	}
@@ -334,6 +343,15 @@ class Receiver {
 			if($filter !== FALSE){ $str = $this->clean($filter, $str); }
 			return trim($str);
 		}
+	}
+
+	function word_position($find){
+		$text = $this->text();
+		if(empty($text)){ return FALSE; }
+		$pos = strpos($text, $find);
+		if($pos === FALSE){ return FALSE; }
+		$text = substr($text, 0, $pos);
+		return count(explode(" ", $text));
 	}
 
 	function clean($pattern = 'alphanumeric-full', $text = NULL){
@@ -382,6 +400,8 @@ class Receiver {
 		elseif($user === TRUE && $this->has_reply){ $user = $this->reply_user->username; }
 		elseif($user instanceof User){ $user = $user->username; }
 		return (!empty($user) && substr(strtolower($user), -3) == "bot");
+		// TODO Si realmente es un bot y se intenta hacer un chatAction, no debería dejar.
+		// A no ser que ese usuario también haya bloqueado al bot.
 	}
 
 	// NOTE: Solo funcionará si el bot está en el grupo.
@@ -404,7 +424,7 @@ class Receiver {
 	}
 
 	function grouplink($text, $url = FALSE){
-		$link = "https://telegram.me/";
+		$link = "https://t.me/";
 		if($text[0] != "@" and strlen($text) == 22){
 			$link .= "joinchat/$text";
 		}else{
@@ -490,6 +510,28 @@ class Receiver {
 		}elseif($self == TRUE){
 			return FALSE;
 		}
+	}
+
+	function reply_target($priority = NULL){
+		if(!$this->has_reply){ return NULL; }
+		// El reply puede ser hacia la persona del mensaje al cual se hace reply
+		// o si es un forward, hacia ese usuario creador del mensaje.
+
+		$ret = $this->reply_user;
+		if($priority == NULL or $priority == TRUE or strtolower($priority) == 'forward'){
+			if($this->reply_is_forward){
+				$ret = $this->reply->forward_from;
+			}
+		}
+
+		return $ret;
+	}
+
+	// Return UserID siempre que sea posible.
+	function user_selector($priority = NULL, $word = NULL){
+		$user = $this->reply_target($priority);
+		if(!empty($user)){ return $user->id; }
+		// TODO
 	}
 
 	function pinned_message($content = NULL){
