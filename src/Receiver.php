@@ -42,6 +42,7 @@ class Receiver {
 	public $caption = NULL;
 	public $callback = FALSE;
 	public $send = FALSE; // Class
+	public $migrate_chat = NULL;
 
 	function set_access($uid, $key = NULL, $name = NULL){
 		$this->bot = new Bot($uid, $key, $name);
@@ -101,6 +102,10 @@ class Receiver {
 					// DEPRECATED
 					$this->new_user = new User($this->data[$this->key]['left_chat_member']);
 					$this->left_user = $this->new_user;
+				}elseif(isset($this->data[$this->key]['migrate_to_chat_id'])){
+					$this->migrate_chat = $this->data[$this->key]['migrate_to_chat_id'];
+				}elseif(isset($this->data[$this->key]['migrate_from_chat_id'])){
+					$this->migrate_chat = $this->data[$this->key]['migrate_from_chat_id'];
 				}
 				if(isset($this->data[$this->key]['entities'])){
 					foreach($this->data[$this->key]['entities'] as $ent){
