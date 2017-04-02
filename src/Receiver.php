@@ -120,6 +120,15 @@ class Receiver {
 				$this->chat = new Chat($this->data[$this->key]['message']['chat']);
 				$this->user = new User($this->data[$this->key]['from']);
 				$this->callback = $this->data[$this->key]['data'];
+			}elseif(isset($this->data['channel_post'])){
+				$this->key = "channel_post";
+				$this->id = $this->data['update_id'];
+				$this->message = $this->data[$this->key]['message_id'];
+				$this->chat = (object) $this->data[$this->key]['chat'];
+
+				if(isset($this->data[$this->key]['from'])){
+					$this->user = (object) $this->data[$this->key]['from'];
+				}
 			}
 		}
 	}
