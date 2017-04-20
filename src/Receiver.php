@@ -220,6 +220,23 @@ class Receiver {
 		return preg_match("/$regex/", $text);
 	}
 
+	function text_regex($expr, $cleanup = TRUE){
+		if(!is_array($expr)){ $expr = [$expr]; }
+		$text = $this->text();
+		if($cleanup){
+			$text = strtolower($text);
+			$text = str_replace(["á", "é", "í", "ó", "ú"], ["a", "e", "i", "o", "u"], $text); // HACK
+			$text = str_replace(["Á", "É", "Í", "Ó", "Ú"], ["A", "E", "I", "O", "U"], $text); // HACK
+			$text = str_replace("%20", " ", $text); // HACK web
+			$text = strtolower($text); // HACK Twice
+		}
+		foreach($expr as $ex){
+			$r = preg_match($ex, $text);
+			if($r){ return $r; }
+		}
+		return FALSE;
+	}
+
 	function text_mention($user = NULL){
 		// Incluye users registrados y anónimos.
 		// NULL -> decir si hay usuarios mencionados o no (T/F)
