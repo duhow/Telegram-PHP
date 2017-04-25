@@ -292,6 +292,7 @@ class Receiver {
 		// STR -> comando definido.
 		// $begin = si es comando inicial
 		if(empty($this->entities)){ return FALSE; }
+		if($cmd === FALSE){ $begin = FALSE; $cmd = NULL; }
 		$cmds = array();
 		$text = $this->text(FALSE); // No UTF-8 clean
 		$initbegin = FALSE;
@@ -299,7 +300,13 @@ class Receiver {
 			if($e->type == 'bot_command'){ $cmds[] = strtolower($e->value); }
 			if($initbegin == FALSE && $e->offset == 0){ $initbegin = TRUE; }
 		}
-		if($cmd == NULL){ return (count($cmds) > 0 ? $cmds[0] : FALSE); }
+		if($cmd == NULL){
+			if(count($cmds) > 0){
+				if($begin && !$initbegin){ return FALSE; }
+				return $cmds[0];
+			}
+			return FALSE;
+		}
 		if($cmd === TRUE){ return $cmds; }
 		if(is_string($cmd)){ $cmd = [$cmd]; }
 		if(is_array($cmd)){
@@ -312,7 +319,10 @@ class Receiver {
 					if($name[0] != "@"){ $name = "@" .$name; }
 					$csel = $csel.$name;
 				}
-				if(in_array($csel, $cmds)){ return TRUE; }
+				if(in_array($csel, $cmds)){
+					if($begin && !$initbegin){ return FALSE; }
+					return TRUE;
+				}
 			}
 		}
 		return FALSE;
