@@ -47,6 +47,7 @@ class Sender {
 	function message($id = NULL){
 		if(empty($id)){ return $this->content['message_id']; }
 		if($id === TRUE && $this->parent instanceof \Telegram\Receiver){ $id = $this->parent->message; }
+		elseif(is_array($id) and isset($id['message_id'])){ $id = $id['message_id']; } // JSON Response from another message.
 		$this->content['message_id'] = $id;
 		return $this;
 	}
