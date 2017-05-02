@@ -223,6 +223,16 @@ class Sender {
 	function get_admins($chat = NULL, $keep = FALSE){ return $this->_parse_generic_chatFunctions("getChatAdministrators", $keep, $chat); }
 	function get_member_info($user = NULL, $chat = NULL, $keep = FALSE){ return $this->_parse_generic_chatFunctions("getChatMember", $keep, $chat, $user); }
 	function get_members_count($chat = NULL, $keep = FALSE){ return $this->_parse_generic_chatFunctions("getChatMembersCount", $keep, $chat); }
+	function get_user_avatar($user = NULL, $offset = NULL, $limit = 100){
+		if(!empty($user)){ $this->content['user_id'] = $user; }
+		$this->content['offset'] = $offset;
+		$this->content['limit'] = $limit;
+		$this->method = "getUserProfilePhotos";
+
+		$res = $this->send($keep);
+		if(!isset($res['photos']) or empty($res['photos'])){ return FALSE; }
+		return $res['photos'];
+	}
 
 	// DEBUG
 	/* function get_message($message, $chat = NULL){
