@@ -220,6 +220,23 @@ class Receiver {
 		return preg_match("/$regex/", $text);
 	}
 
+	// WIP TODO
+	function text_has_emoji($emoji = NULL, $return = FALSE){
+		if(empty($emoji)){
+			return (strpos($this->text_encoded(), '\u') !== FALSE);
+		}elseif(is_array($emoji)){
+			foreach($emoji as $e){
+				if(empty($e)){ continue; }
+				$r = $this->text_has_emoji($e, $return);
+				if($r !== FALSE){ return $r; }
+			}
+			return FALSE;
+		}
+		if(in_array(strpos($emoji, 0, 1), [':', '\\')){ $emoji = $this->emoji($emoji); }
+		$text = $this->emoji($this->text());
+		return (strpos($text, $emoji) !== FALSE);
+	}
+
 	function text_regex($expr, $cleanup = TRUE){
 		if(!is_array($expr)){ $expr = [$expr]; }
 		$text = $this->text();
