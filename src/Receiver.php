@@ -439,21 +439,24 @@ class Receiver {
 	 *  string date = diff date - Telegram timestamp.
 	 *  string date_format = return specified date format.
 	 */
-	function date($parse = NULL){
-		if($parse === NULL){ return date("Y-m-d H:i:s", $this->timestamp); }
+	function date($parse = NULL, $time = NULL){
+		if(empty($time)){ $time = $this->timestamp; }
+		if(empty($time)){ $time = time(); } // TEMP HACK Si no hay timestamp.
+
+		if($parse === NULL){ return date("Y-m-d H:i:s", $time); }
 		elseif($parse === TRUE){ $parse = time(); }
 
 		if(is_numeric($parse)){
 			// timestamp, diff time.
-			return ($parse - $this->timestamp);
+			return ($parse - $time);
 		}else{
 			$date = strtotime($parse);
 			if($date > 0){
 				// Diff with timestamp
-				return ($date - $this->timestamp);
+				return ($date - $time);
 			}
 			// Parse date format
-			return date($parse, $this->timestamp);
+			return date($parse, $time);
 		}
 	}
 
