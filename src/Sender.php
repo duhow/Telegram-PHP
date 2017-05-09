@@ -277,18 +277,17 @@ class Sender {
 		return $this->send();
 	}
 
-	// TODO
-	/* function delete($message = NULL, $chat = NULL){
+	function delete($message = NULL, $chat = NULL){
 		if(empty($chat) && !isset($this->context['chat_id'])){
 			$this->context['chat_id'] = $this->parent->chat->id;
 		}
-		if(empty($message) && !isset($this->context['message_id'])){
+		if(empty($message) or $message === TRUE && !isset($this->context['message_id'])){
 			$this->context['message_id'] = $this->parent->id;
 		}
 
 		$this->method = "deleteMessage";
 		return $this->send();
-	} */
+	}
 
 	function _push($key, $val){
 		$this->content[$key] = $val;
@@ -300,8 +299,7 @@ class Sender {
 		$this->content = array();
 	}
 
-	private function _url($with_method = FALSE){
-		$host = "api.telegram.org";
+	private function _url($with_method = FALSE, $host = "api.telegram.org"){
 		$url = ("https://$host/bot" .$this->bot->id .':' .$this->bot->key .'/');
 		if($with_method){ $url .= $this->method; }
 		return $url;
