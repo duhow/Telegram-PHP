@@ -466,7 +466,8 @@ class Receiver {
 		$chfull = $this->emoji($chfull);
 		$chempty = $this->emoji($chempty);
 
-		$nfull = min(floor(($val / $max) * $chars), 0);
+		$nfull = floor(($val / $max) * $chars);
+		if($nfull < 0){ $nfull = 0; }
 		$nempty = max(($chars - $nfull), 0);
 
 		$str = "";
