@@ -457,6 +457,22 @@ class Receiver {
 		}
 	}
 
+	function progressbar($val, $max = 100, $chars = 12, $chfull = NULL, $chempty = NULL){
+		if(empty($chfull)){ $chfull = "\u2588"; }
+		if(empty($chempty)){ $chempty = "\u2592"; }
+		$chfull = $this->emoji($chfull);
+		$chempty = $this->emoji($chempty);
+
+		$nfull = min(floor(($val / $max) * $chars), 0);
+		$nempty = max(($chars - $nfull), 0);
+
+		$str = "";
+		for($i = 0; $i < $nfull; $i++){ $str .= $chfull; }
+		for($i = 0; $i < $nempty; $i++){ $str .= $chempty; }
+
+		return $str;
+	}
+
 	function is_chat_group(){ return isset($this->chat->type) && in_array($this->chat->type, ["group", "supergroup"]); }
 	function data_received($expect = NULL){
 		if($expect !== NULL){
