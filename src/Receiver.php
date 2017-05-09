@@ -232,7 +232,7 @@ class Receiver {
 			}
 			return FALSE;
 		}
-		if(in_array(strpos($emoji, 0, 1), [':', '\\')){ $emoji = $this->emoji($emoji); }
+		if(in_array(strpos($emoji, 0, 1), [':', '\\'])){ $emoji = $this->emoji($emoji); }
 		$text = $this->emoji($this->text());
 		return (strpos($text, $emoji) !== FALSE);
 	}
