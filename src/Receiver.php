@@ -26,6 +26,7 @@ class Receiver {
 	public $id = NULL;
 	public $message = NULL; // DEPRECATED
 	public $message_id = NULL;
+	public $timestamp = 0;
 	public $chat = NULL;
 	public $user = NULL;
 	public $entities = NULL;
@@ -69,6 +70,7 @@ class Receiver {
 				}
 				$this->message = $this->data[$this->key]['message_id']; // DEPRECATED
 				$this->message_id = intval($this->data[$this->key]['message_id']);
+				$this->timestamp = $this->data[$this->key]['date']; // HACK Tener en cuenta edit_date
 				$this->chat = new Chat($this->data[$this->key]['chat']);
 				$this->user = new User($this->data[$this->key]['from']);
 				if(isset($this->data[$this->key]['caption'])){
@@ -123,7 +125,8 @@ class Receiver {
 			}elseif(isset($this->data['channel_post'])){
 				$this->key = "channel_post";
 				$this->id = $this->data['update_id'];
-				$this->message = $this->data[$this->key]['message_id'];
+				$this->message_id = $this->data[$this->key]['message_id'];
+				$this->timestamp = $this->data[$this->key]['date'];
 				$this->chat = (object) $this->data[$this->key]['chat'];
 
 				if(isset($this->data[$this->key]['from'])){
@@ -426,6 +429,32 @@ class Receiver {
 		if($pattern == FALSE){ return $text; }
 		if(!isset($pats[$pattern])){ return FALSE; }
 		return preg_replace($pats[$pattern], "", $text);
+	}
+
+	/**
+	 *  Return date of message.
+	 *  TRUE = diff time() - Telegram timestamp.
+	 *  NULL = return date format.
+	 *  int = diff int time() - Telegram timestamp.
+	 *  string date = diff date - Telegram timestamp.
+	 *  string date_format = return specified date format.
+	 */
+	function date($parse = NULL){
+		if($parse === NULL){ return date("Y-m-d H:i:s", $this->timestamp); }
+		elseif($parse === TRUE){ $parse = time(); }
+
+		if(is_numeric($parse)){
+			// timestamp, diff time.
+			return ($parse - $this->timestamp);
+		}else{
+			$date = strtotime($parse);
+			if($date > 0){
+				// Diff with timestamp
+				return ($date - $this->timestamp);
+			}
+			// Parse date format
+			return date($parse, $this->timestamp);
+		}
 	}
 
 	function is_chat_group(){ return isset($this->chat->type) && in_array($this->chat->type, ["group", "supergroup"]); }
