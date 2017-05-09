@@ -1,6 +1,7 @@
 <?php
 
 namespace Telegram\Elements;
+use Telegram\User as User;
 
 class MessageEntity {
 	public $type;
