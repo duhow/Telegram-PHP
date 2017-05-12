@@ -280,6 +280,8 @@ class Sender {
 	function delete($message = NULL, $chat = NULL){
 		if($message === TRUE or (empty($message) && !isset($this->context['message_id']))){
 			$this->message(TRUE);
+		}elseif(is_array($message) and isset($message['message_id'])){
+			$this->message($message['message_id']);
 		}
 		if($message === TRUE or (empty($chat) && !isset($this->context['chat_id']))){
 			$this->chat(TRUE);
