@@ -278,13 +278,12 @@ class Sender {
 	}
 
 	function delete($message = NULL, $chat = NULL){
-		if(empty($chat) && !isset($this->context['chat_id'])){
-			$this->context['chat_id'] = $this->parent->chat->id;
+		if($message === TRUE or (empty($message) && !isset($this->context['message_id']))){
+			$this->message(TRUE);
 		}
-		if(empty($message) or $message === TRUE && !isset($this->context['message_id'])){
-			$this->context['message_id'] = $this->parent->id;
+		if($message === TRUE or (empty($chat) && !isset($this->context['chat_id']))){
+			$this->chat(TRUE);
 		}
-
 		$this->method = "deleteMessage";
 		return $this->send();
 	}
