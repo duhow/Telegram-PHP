@@ -7,6 +7,7 @@ class Sender {
 	private $parent;
 	public $bot;
 	private $content = array();
+	private $broadcast = NULL;
 	private $method = NULL;
 	private $_keyboard;
 	private $_inline;
@@ -35,6 +36,13 @@ class Sender {
 	function chat($id = NULL){
 		if($id === TRUE && $this->parent instanceof \Telegram\Receiver){ $id = $this->parent->chat->id; }
 		$this->content['chat_id'] = $id;
+		return $this;
+	}
+
+	function chats($ids){
+		if(empty($ids)){ return $this; } // HACK
+		$this->broadcast = $ids;
+		$this->content['chat_id'] = $ids[0]; // HACK
 		return $this;
 	}
 
@@ -70,7 +78,7 @@ class Sender {
 			$file = $tmp;
 		}
 
-		$this->method = "send" .ucfirst($type);
+		$this->method = "send" .ucfirst(strtolower($type));
 		if(file_exists(realpath($file))){
 			$this->content[$type] = new \CURLFile(realpath($file));
 		}else{
@@ -86,6 +94,29 @@ class Sender {
 			$this->content[$key] = $caption;
 		}
 
+		if(!empty($this->broadcast)){
+			$result = array();
+
+			foreach($this->broadcast as $chat){
+				$this->chat($chat);
+
+				$ch = curl_init();
+				curl_setopt($ch, CURLOPT_HTTPHEADER, array(
+					"Content-Type:multipart/form-data"
+				));
+				curl_setopt($ch, CURLOPT_URL, $this->_url(TRUE));
+				curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+				curl_setopt($ch, CURLOPT_POSTFIELDS, $this->content);
+				$result[] = curl_exec($ch);
+
+				curl_close($ch);
+			}
+
+			if($url === TRUE){ unlink($file); }
+			if($keep === FALSE){ $this->_reset(); }
+			return $result;
+		}
+
 		if(empty($this->content['chat_id']) && $this->parent instanceof Receiver){ $this->content['chat_id'] = $this->parent->chat->id; }
 
 		$ch = curl_init();
@@ -96,6 +127,7 @@ class Sender {
 		curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
 		curl_setopt($ch, CURLOPT_POSTFIELDS, $this->content);
 		$output = curl_exec($ch);
+		curl_close($ch);
 
 		if($url === TRUE){ unlink($file); }
 		if($keep === FALSE){ $this->_reset(); }
@@ -312,7 +344,17 @@ class Sender {
 		return $url;
 	}
 
-	function send($keep = FALSE){
+	function send($keep = FALSE, $_broadcast = FALSE){
+		if(!empty($this->broadcast) and !$_broadcast){
+			$result = array();
+			foreach($this->broadcast as $chat){
+				$this->content['chat_id'] = $chat;
+				// Send and keep data
+				$result[] = $this->send(TRUE, TRUE);
+			}
+			return $result;
+		}
+
 		if(empty($this->method)){ return FALSE; }
 		if(empty($this->content['chat_id']) && $this->parent instanceof Receiver){ $this->content['chat_id'] = $this->parent->chat->id; }
 
