@@ -328,6 +328,30 @@ class Sender {
 		return $this->send();
 	}
 
+	function game($name, $notification = FALSE){
+		$this->content['game_short_name'] = $name;
+		$this->content['disable_notification'] = (bool) $notification;
+
+		$this->method = "sendGame";
+		return $this;
+	}
+
+	function game_score($user, $score = NULL, $force = FALSE, $edit_message = TRUE){
+		$this->content['user_id'] = $user;
+
+		if($score == NULL){
+			$this->method = "getGameHighScores";
+			return $this;
+		}
+
+		$this->content['score'] = (int) $score;
+		if($force){ $this->content['force'] = (bool) $force; }
+		if(!$edit_message){ $this->content['disable_edit_message'] = FALSE; }
+
+		$this->method = "setGameScore";
+		return $this;
+	}
+
 	function _push($key, $val){
 		$this->content[$key] = $val;
 		return $this;
