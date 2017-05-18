@@ -6,11 +6,12 @@ class User {
 	public $id = NULL;
 	public $first_name = NULL;
 	public $last_name = NULL;
+	public $language_code = NULL;
 	public $username = NULL;
 	protected $bot;
 	protected $extra = array();
 
-	function __construct($id, $first_name = NULL, $last_name = NULL, $username = NULL){
+	function __construct($id, $first_name = NULL, $last_name = NULL, $username = NULL, $language_code = NULL){
 		if(is_array($id)){
 			foreach($id as $k => $v){
 				$$k = $v;
@@ -25,6 +26,7 @@ class User {
 		$this->first_name = trim($first_name);
 		$this->username = trim($username);
 		$this->last_name = trim($last_name);
+		$this->language_code = trim($language_code);
 
 		return $this;
 	}

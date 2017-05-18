@@ -29,6 +29,7 @@ class Receiver {
 	public $timestamp = 0;
 	public $chat = NULL;
 	public $user = NULL;
+	public $language = NULL;
 	public $entities = NULL;
 	public $reply = NULL;
 	public $new_user = NULL;
@@ -73,6 +74,13 @@ class Receiver {
 				$this->timestamp = $this->data[$this->key]['date']; // HACK Tener en cuenta edit_date
 				$this->chat = new Chat($this->data[$this->key]['chat']);
 				$this->user = new User($this->data[$this->key]['from']);
+				if(isset($this->data[$this->key]['from']['language_code'])){
+					$this->language = $this->data[$this->key]['from']['language_code'];
+					if(strpos($this->language, "-") !== FALSE){
+						$this->language = explode("-", $this->language);
+						$this->language = strtolower($this->language[0]);
+					}
+				}
 				if(isset($this->data[$this->key]['caption'])){
 					$this->caption = $this->data[$this->key]['caption'];
 				}
