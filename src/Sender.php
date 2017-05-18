@@ -11,10 +11,12 @@ class Sender {
 	private $method = NULL;
 	private $_keyboard;
 	private $_inline;
+	private $_payment;
 
 	function __construct($uid = NULL, $key = NULL, $name = NULL){
 		$this->_keyboard = new \Telegram\Keyboards\Keyboard($this);
 		$this->_inline = new \Telegram\Keyboards\InlineKeyboard($this);
+		$this->_payment = new \Telegram\Payments\Stripe($this);
 
 		if(!empty($uid)){
 			if($uid instanceof Receiver){
@@ -192,6 +194,23 @@ class Sender {
 
 	function keyboard(){ return $this->_keyboard; }
 	function inline_keyboard(){ return $this->_inline; }
+	function payment($provider = "Stripe"){
+		$this->_payment = new \Telegram\Payments\Stripe($this);
+		return $this->_payment;
+	}
+
+	function payment_precheckout($id, $ok = TRUE){
+		$this->content['pre_checkout_query_id'] = $id;
+		if($ok === TRUE){
+			$this->content['ok'] = TRUE;
+		}else{
+			$this->content['ok'] = FALSE;
+			$this->content['error_message'] = $ok;
+		}
+
+		$this->method = "answerPreCheckoutQuery";
+		return $this->send();
+	}
 
 	function force_reply($selective = TRUE){
 		$this->content['reply_markup'] = ['force_reply' => TRUE, 'selective' => $selective];
@@ -510,6 +529,5 @@ class Sender {
 		return $this->exec_curl_request($handle);
 	}
 }
-
 
 ?>

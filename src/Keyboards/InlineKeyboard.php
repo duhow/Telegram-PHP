@@ -64,6 +64,7 @@ class InlineKeyboardRow {
 		}
 		elseif($switch === FALSE){ $data['switch_inline_query'] = $request; }
 		elseif(is_string($switch) && strtolower($switch) == "text"){ $data['callback_data'] = "T:" .$request; }
+		elseif(is_string($switch) && strtolower($switch) == "pay"){ $data['pay'] = TRUE; }
 		elseif($switch === NULL or is_string($switch)){ $data['callback_data'] = $request; }
 		if(is_string($switch)){ $data['switch_inline_query'] = $switch; }
 		$this->buttons[] = $data;

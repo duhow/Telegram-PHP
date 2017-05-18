@@ -9,6 +9,8 @@ $files = [
 	$dir .'Keyboards/Keyboard.php',
 	$dir .'Keyboards/InlineKeyboard.php',
 
+	$dir .'Payments/Stripe.php',
+
 	$dir .'Elements/Base.php',
 	$dir .'Elements/Voice.php', // REQUIRED for priority
 ];
