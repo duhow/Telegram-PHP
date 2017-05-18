@@ -69,7 +69,7 @@ class Sender {
 	}
 
 	function file($type, $file, $caption = NULL, $keep = FALSE){
-		if(!in_array($type, ["photo", "audio", "voice", "document", "sticker", "video"])){ return FALSE; }
+		if(!in_array($type, ["photo", "audio", "voice", "document", "sticker", "video", "video_note", "videonote"])){ return FALSE; }
 
 		$url = FALSE;
 		if(filter_var($file, FILTER_VALIDATE_URL) !== FALSE){
@@ -81,6 +81,10 @@ class Sender {
 		}
 
 		$this->method = "send" .ucfirst(strtolower($type));
+		if(in_array($type, ["videonote", "video_note"])){
+			$type = "video_note";
+			$this->method = "sendVideoNote";
+		}
 		if(file_exists(realpath($file))){
 			$this->content[$type] = new \CURLFile(realpath($file));
 		}else{
@@ -255,7 +259,10 @@ class Sender {
 	}
 
 	function chat_action($type){
-		$actions = ['typing', 'upload_photo', 'record_video', 'upload_video', 'record_audio', 'upload_audio', 'upload_document', 'find_location'];
+		$actions = [
+			'typing', 'upload_photo', 'record_video', 'upload_video', 'record_audio', 'upload_audio',
+			'upload_document', 'find_location', 'record_video_note', 'upload_video_note'
+		];
 		if(!in_array($type, $actions)){ $type = $actions[0]; } // Default is typing
 		$this->content['action'] = $type;
 		$this->method = "sendChatAction";

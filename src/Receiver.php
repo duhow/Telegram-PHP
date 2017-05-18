@@ -485,7 +485,7 @@ class Receiver {
 		$data = [
 			"migrate_to_chat_id", "migrate_from_chat_id",
 			"new_chat_participant", "left_chat_participant", "new_chat_members", "new_chat_member", "left_chat_member",
-			"reply_to_message", "text", "audio", "document", "photo", "voice", "location", "contact"
+			"reply_to_message", "text", "audio", "document", "photo", "video_note", "voice", "location", "contact"
 		];
 		foreach($data as $t){
 			if(isset($this->data[$this->key][$t])){
@@ -561,7 +561,7 @@ class Receiver {
 	}
 
 	function data($type, $object = TRUE){
-		$accept = ["text", "audio", "video", "document", "photo", "voice", "location", "contact"];
+		$accept = ["text", "audio", "video", "video_note", "document", "photo", "voice", "location", "contact"];
 		$type = strtolower($type);
 		if(in_array($type, $accept) && isset($this->data['message'][$type])){
 			if($object){ return (object) $this->data['message'][$type]; }
@@ -585,6 +585,7 @@ class Receiver {
 	function location($object = TRUE){ return $this->_generic_content('location', $object); }
 	function voice($object = NULL){ return $this->_generic_content('voice', $object); }
  	function video($object = NULL){ return $this->_generic_content('video', $object); }
+	function video_note($object = NULL){ return $this->_generic_content('video_note', $object); }
 	function sticker($object = NULL){ return $this->_generic_content('sticker', $object); }
 
 	function gif(){
