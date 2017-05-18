@@ -7,8 +7,9 @@ class Sender {
 	private $parent;
 	public $bot;
 	private $content = array();
-	private $broadcast = NULL;
 	private $method = NULL;
+	private $broadcast = NULL;
+	private $language = "en";
 	private $_keyboard;
 	private $_inline;
 	private $_payment;
@@ -22,6 +23,7 @@ class Sender {
 			if($uid instanceof Receiver){
 				$this->parent = $uid;
 				$this->bot = $this->parent->bot;
+				$this->language = $this->parent->language;
 			}elseif($uid instanceof Bot){
 				$this->bot = $uid;
 			}else{
@@ -187,7 +189,22 @@ class Sender {
 		return $this;
 	}
 
+	function language($set){
+		$this->language = $set;
+		return $this;
+	}
+
 	function text($text, $type = NULL){
+		if(is_array($text)){
+			if(isset($text[$this->language])){
+				$text = $text[$this->language];
+			}elseif(isset($text["en"])){
+				$text = $text["en"];
+			}else{
+				$text = current($text); // First element.
+			}
+		}
+
 		$this->content['text'] = $text;
 		$this->method = "sendMessage";
 		if($type === TRUE){ $this->content['parse_mode'] = 'Markdown'; }
