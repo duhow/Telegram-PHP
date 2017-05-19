@@ -224,7 +224,18 @@ class Sender {
 			}
 		}
 
-		$text = str_replace(array_keys($replace), array_values($replace), $text);
+		if(strpos($text, "%s") !== FALSE){
+			if(!is_array($replace)){ $replace = [$replace]; }
+			$pos = 0;
+			foreach($replace as $r){
+				$pos = strpos($text, "%s", $pos);
+				if($pos === FALSE){ break; }
+				$text = substr_replace($text, $r, $pos, 2); // 2 = strlen("%s")
+			}
+		}else{
+			$text = str_replace(array_keys($replace), array_values($replace), $text);
+		}
+
 		return $this->text($text, $type);
 	}
 
