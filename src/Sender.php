@@ -213,6 +213,21 @@ class Sender {
 		return $this;
 	}
 
+	function text_replace($text, $replace, $type = NULL){
+		if(is_array($text)){
+			if(isset($text[$this->language])){
+				$text = $text[$this->language];
+			}elseif(isset($text["en"])){
+				$text = $text["en"];
+			}else{
+				$text = current($text); // First element.
+			}
+		}
+
+		$text = str_replace(array_keys($replace), array_values($replace), $text);
+		return $this->text($text, $type);
+	}
+
 	function keyboard(){ return $this->_keyboard; }
 	function inline_keyboard(){ return $this->_inline; }
 	function payment($provider = "Stripe"){
