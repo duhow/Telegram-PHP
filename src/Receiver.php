@@ -325,8 +325,10 @@ class Receiver {
 		$text = $this->text(FALSE); // No UTF-8 clean
 		$initbegin = FALSE;
 		foreach($this->entities as $e){
-			if($e->type == 'bot_command'){ $cmds[] = strtolower($e->value); }
-			if($initbegin == FALSE && $e->offset == 0){ $initbegin = TRUE; }
+			if($e->type == 'bot_command'){
+				$cmds[] = strtolower($e->value);
+				if($initbegin == FALSE && $e->offset == 0){ $initbegin = TRUE; }
+			}
 		}
 		if($cmd == NULL){
 			if(count($cmds) > 0){
@@ -341,16 +343,13 @@ class Receiver {
 			foreach($cmd as $csel){
 				if($csel[0] != "/"){ $csel = "/" .$csel; }
 				$csel = strtolower($csel);
-				if(in_array($csel, $cmds) && strpos($csel, "@") === FALSE){ return TRUE; }
+				if(in_array($csel, $cmds) && strpos($csel, "@") === FALSE){ return !($begin && !$initbegin); }
 				$name = $this->bot->username;
 				if($name){
 					if($name[0] != "@"){ $name = "@" .$name; }
 					$csel = $csel.$name;
 				}
-				if(in_array($csel, $cmds)){
-					if($begin && !$initbegin){ return FALSE; }
-					return TRUE;
-				}
+				if(in_array($csel, $cmds)){ return !($begin && !$initbegin); }
 			}
 		}
 		return FALSE;
