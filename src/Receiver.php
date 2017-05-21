@@ -468,10 +468,8 @@ class Receiver {
 	}
 
 	function progressbar($val, $max = 100, $chars = 12, $chfull = NULL, $chempty = NULL){
-		if(empty($chfull)){ $chfull = "\u2588"; }
-		if(empty($chempty)){ $chempty = "\u2592"; }
-		$chfull = $this->emoji($chfull);
-		$chempty = $this->emoji($chempty);
+		$chfull  = (empty($chfull) ? json_decode('"\u2588"') : $this->emoji($chfull));
+		$chempty = (empty($chempty) ? json_decode('"\u2592"') : $this->emoji($chempty));
 
 		$nfull = floor(($val / $max) * $chars);
 		if($nfull < 0){ $nfull = 0; }
