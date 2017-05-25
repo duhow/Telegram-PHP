@@ -130,8 +130,12 @@ class Receiver {
 				$this->chat = new Chat($this->data[$this->key]['message']['chat']);
 				$this->user = new User($this->data[$this->key]['from']);
 				$this->callback = $this->data[$this->key]['data'];
-			}elseif(isset($this->data['channel_post'])){
-				$this->key = "channel_post";
+			}elseif(isset($this->data['channel_post']) or isset($this->data['edited_channel_post'])){
+				$this->key = (isset($this->data['edited_channel_post']) ? "edited_channel_post" : "channel_post");
+				if($this->key == "edited_channel_post"){
+					$this->is_edit = TRUE;
+					$this->edit_date = $this->data[$this->key]['edit_date'];
+				}
 				$this->id = $this->data['update_id'];
 				$this->message_id = $this->data[$this->key]['message_id'];
 				$this->timestamp = $this->data[$this->key]['date'];
