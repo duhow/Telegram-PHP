@@ -42,6 +42,7 @@ class Receiver {
 	public $edit_date = NULL;
 	public $reply_is_forward = FALSE;
 	public $caption = NULL;
+	public $offset = NULL; // inline query
 	public $callback = FALSE;
 	public $send = FALSE; // Class
 	public $migrate_chat = NULL;
@@ -144,6 +145,13 @@ class Receiver {
 				if(isset($this->data[$this->key]['from'])){
 					$this->user = (object) $this->data[$this->key]['from'];
 				}
+			}elseif(isset($this->data['inline_query'])){
+				$this->key = "inline_query";
+				$this->id = $this->data[$this->key]['id'];
+				// $this->message_id = $this->data[$this->key]['id'];
+				$this->user = new User($this->data[$this->key]['from']);
+				$this->chat = new Chat($this->data[$this->key]['from']); // Compatibility, but not set
+				$this->offset = $this->data[$this->key]['offset'];
 			}
 		}
 	}
@@ -158,10 +166,24 @@ class Receiver {
 		$text = @$this->data[$this->key]['text'];
 		if($this->key == "callback_query"){
 			$text = @$this->data[$this->key]['data'];
-			$text = (substr($text, 0, 2) == "T:" ? substr($text, 2) : NULL);
+			if(substr($text, 0, 2) != "T:"){ return NULL; }
+			$text = substr($text, 2);
 		}
 		if($clean === TRUE){ $text = $this->clean('alphanumeric-full-spaces', $text); }
 		return $text;
+	}
+
+	function text_query(){
+		if($this->key != "inline_query"){ return FALSE; }
+		$text = $this->data[$this->key]['query'];
+		if(empty($text)){ $text = NULL; }
+		return $text;
+	}
+
+	function text_query_has($input, $next_word = NULL, $position = NULL){
+		$text = $this->text_query();
+		if(empty($text)){ return FALSE; }
+		return $this->text_has($input, $next_word, $position, $text, TRUE);
 	}
 
 	function text_encoded($clean_quotes = FALSE){
@@ -188,28 +210,33 @@ class Receiver {
 		return FALSE;
 	}
 
-	function text_has($input, $next_word = NULL, $position = NULL){
+	private function text_cleanup_prepare($input, $tolower = TRUE){
+		if($tolower){ $input = strtolower($input); }
+		$vocals = [
+			"á" => "a", "é" => "e", "í" => "i", "ó" => "o", "ú" => "u",
+			"Á" => "A", "É" => "E", "Í" => "I", "Ó" => "O", "Ú" => "U"
+		];
+		$input = str_replace(array_keys($vocals), array_values($vocals), $input);
+		$input = str_replace("%20", " ", $input); // HACK web
+		if($tolower){ $input = strtolower($input); }
+		return $input;
+	}
+
+	function text_has($input, $next_word = NULL, $position = NULL, $text = NULL, $cleanup = TRUE){
 		// A diferencia de text_contains, esto no será valido si la palabra no es la misma.
 		// ($input = "fanta") -> fanta OK , fanta! OK , fantasma KO
 		if(!is_array($input)){ $input = array($input); }
 		// FIXME si algun input contiene un PIPE | , ya me ha jodio. Controlarlo.
 
 		$input = implode("|", $input);
-		$input = strtolower($input); // HACK util o molesto en segun que casos?
-		$input = str_replace(["á", "é", "í", "ó", "ú"], ["a", "e", "i", "o", "u"], $input); // HACK mas de lo mismo, ayuda o molesta?
-		$input = str_replace(["Á", "É", "Í", "Ó", "Ú"], ["A", "E", "I", "O", "U"], $input); // HACK
-		$input = str_replace("%20", " ", $input); // HACK web
-		$input = strtolower($input);
+		$input = $this->text_cleanup_prepare($input, TRUE);
         $input = str_replace("/", "\/", $input); // CHANGED fix para escapar comandos y demás.
 
 		if(is_bool($next_word)){ $position = $next_word; $next_word = NULL; }
 		elseif($next_word !== NULL){
 			if(!is_array($next_word)){ $next_word = array($next_word); }
 			$next_word = implode("|", $next_word);
-			$next_word = strtolower($next_word); // HACK
-			$next_word = str_replace(["á", "é", "í", "ó", "ú"], ["a", "e", "i", "o", "u"], $next_word); // HACK
-			$next_word = str_replace(["Á", "É", "Í", "Ó", "Ú"], ["A", "E", "I", "O", "U"], $next_word); // HACK
-			$next_word = strtolower($next_word); // HACK
+			$next_word = $this->text_cleanup_prepare($next_word, TRUE);
             $next_word = str_replace("/", "\/", $next_word); // CHANGED
 		}
 
@@ -227,11 +254,11 @@ class Receiver {
 			else{ $regex = "(" .$input .')([\s!.,"]?)\s(' .$next_word .')([\s!?.,"])|(' .$input .')([\s!.,"]?)\s(' .$next_word .')([!?.,"]?)$'; }
 		}
 
-		$text = strtolower($this->text());
-		$text = str_replace(["á", "é", "í", "ó", "ú"], ["a", "e", "i", "o", "u"], $text); // HACK
-		$text = str_replace(["Á", "É", "Í", "Ó", "Ú"], ["A", "E", "I", "O", "U"], $text); // HACK
-		$text = str_replace("%20", " ", $text); // HACK web
-		$text = strtolower($text);
+		if($text === NULL){ $text = strtolower($this->text()); }
+		if($cleanup){
+			$text = $this->text_cleanup_prepare($text, FALSE);
+			$text = strtolower($text);
+		}
 		return preg_match("/$regex/", $text);
 	}
 
@@ -580,8 +607,8 @@ class Receiver {
 	}
 
 	function _generic_content($key, $object = NULL, $rkey = 'file_id'){
-		if(!isset($this->data['message'][$key])){ return FALSE; }
-		$data = $this->data['message'][$key];
+		if(!isset($this->data[$this->key][$key])){ return FALSE; }
+		$data = $this->data[$this->key][$key];
 		if(empty($data)){ return FALSE; }
 		if($object === TRUE){ return (object) $data; }
 		elseif($object === FALSE){ return array_values($data); }
