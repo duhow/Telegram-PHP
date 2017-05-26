@@ -209,6 +209,7 @@ class Sender {
 		$this->method = "sendMessage";
 		if($type === TRUE){ $this->content['parse_mode'] = 'Markdown'; }
 		elseif(in_array($type, ['Markdown', 'HTML'])){ $this->content['parse_mode'] = $type; }
+		elseif($text != strip_tags($text)){ $this->content['parse_mode'] = 'HTML'; } // Autodetect HTML.
 
 		return $this;
 	}
