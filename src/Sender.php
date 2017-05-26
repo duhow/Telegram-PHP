@@ -516,18 +516,15 @@ class Sender {
 			return false;
 		}
 
-		$url = $this->_url(TRUE);
-
-		if(!$post){
-			foreach ($parameters as $key => &$val) {
-			// encoding to JSON array parameters, for example reply_markup
-				if (!is_numeric($val) && !is_string($val)) {
-					$val = json_encode($val);
-				}
+		foreach ($parameters as $key => &$val) {
+		// encoding to JSON array parameters, for example reply_markup
+			if (!is_numeric($val) && !is_string($val) && !($val instanceof \CURLFile) ) {
+				$val = json_encode($val);
 			}
-
-			$url .= '?'.http_build_query($parameters);
 		}
+
+		$url = $this->_url(TRUE);
+		if(!$post){ $url .= '?'.http_build_query($parameters); }
 
 		$handle = curl_init($url);
 		curl_setopt($handle, CURLOPT_RETURNTRANSFER, TRUE);
