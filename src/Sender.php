@@ -102,43 +102,10 @@ class Sender {
 			$this->content[$key] = $caption;
 		}
 
-		if(!empty($this->broadcast)){
-			$result = array();
-
-			foreach($this->broadcast as $chat){
-				$this->chat($chat);
-
-				$ch = curl_init();
-				curl_setopt($ch, CURLOPT_HTTPHEADER, array(
-					"Content-Type:multipart/form-data"
-				));
-				curl_setopt($ch, CURLOPT_URL, $this->_url(TRUE));
-				curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-				curl_setopt($ch, CURLOPT_POSTFIELDS, $this->content);
-				$result[] = curl_exec($ch);
-
-				curl_close($ch);
-			}
-
-			if($url === TRUE){ unlink($file); }
-			if($keep === FALSE){ $this->_reset(); }
-			return $result;
-		}
-
-		if(empty($this->content['chat_id']) && $this->parent instanceof Receiver){ $this->content['chat_id'] = $this->parent->chat->id; }
-
-		$ch = curl_init();
-		curl_setopt($ch, CURLOPT_HTTPHEADER, array(
-			"Content-Type:multipart/form-data"
-		));
-		curl_setopt($ch, CURLOPT_URL, $this->_url(TRUE));
-		curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-		curl_setopt($ch, CURLOPT_POSTFIELDS, $this->content);
-		$output = curl_exec($ch);
-		curl_close($ch);
-
+		$output = $this->send("POSTKEEP");
 		if($url === TRUE){ unlink($file); }
 		if($keep === FALSE){ $this->_reset(); }
+
 		return $output;
 		// return $this;
 	}
@@ -441,10 +408,12 @@ class Sender {
 	function send($keep = FALSE, $_broadcast = FALSE){
 		if(!empty($this->broadcast) and !$_broadcast){
 			$result = array();
+			if(in_array(strtoupper($keep), ["POST", "POSTKEEP"])){ $keep = "POSTKEEP"; }
+			else{ $keep = TRUE; }
 			foreach($this->broadcast as $chat){
 				$this->content['chat_id'] = $chat;
 				// Send and keep data
-				$result[] = $this->send(TRUE, TRUE);
+				$result[] = $this->send($keep, TRUE);
 			}
 			return $result;
 		}
@@ -452,7 +421,15 @@ class Sender {
 		if(empty($this->method)){ return FALSE; }
 		if(empty($this->content['chat_id']) && $this->parent instanceof Receiver){ $this->content['chat_id'] = $this->parent->chat->id; }
 
-		$result = $this->Request($this->method, $this->content);
+		$post = FALSE;
+
+		if(is_string($keep)){
+			$keep = strtoupper($keep);
+			if($keep == "POST"){ $keep = FALSE; $post = TRUE; }
+			elseif($keep = "POSTKEEP"){ $keep = TRUE; $post = TRUE; }
+		}
+
+		$result = $this->Request($this->method, $this->content, $post);
 		if($keep === FALSE){ $this->_reset(); }
 		return $result;
 	}
@@ -526,7 +503,7 @@ class Sender {
 		return $response;
 	}
 
-	function Request($method, $parameters) {
+	private function Request($method, $parameters, $post = FALSE) {
 		if (!is_string($method)) {
 			error_log("Method name must be a string\n");
 			return false;
@@ -539,43 +516,28 @@ class Sender {
 			return false;
 		}
 
-		foreach ($parameters as $key => &$val) {
-		// encoding to JSON array parameters, for example reply_markup
-			if (!is_numeric($val) && !is_string($val)) {
-				$val = json_encode($val);
+		$url = $this->_url(TRUE);
+
+		if(!$post){
+			foreach ($parameters as $key => &$val) {
+			// encoding to JSON array parameters, for example reply_markup
+				if (!is_numeric($val) && !is_string($val)) {
+					$val = json_encode($val);
+				}
 			}
+
+			$url .= '?'.http_build_query($parameters);
 		}
-		$url = $this->_url() .$method.'?'.http_build_query($parameters);
 
 		$handle = curl_init($url);
-		curl_setopt($handle, CURLOPT_RETURNTRANSFER, true);
+		curl_setopt($handle, CURLOPT_RETURNTRANSFER, TRUE);
 		curl_setopt($handle, CURLOPT_CONNECTTIMEOUT, 5);
 		curl_setopt($handle, CURLOPT_TIMEOUT, 60);
 
-		return $this->exec_curl_request($handle);
-	}
-
-	function RequestJson($method, $parameters) {
-		if (!is_string($method)) {
-			error_log("Method name must be a string\n");
-			return false;
+		if($post){
+			curl_setopt($handle, CURLOPT_HTTPHEADER, ["Content-Type:multipart/form-data"]);
+			curl_setopt($handle, CURLOPT_POSTFIELDS, $parameters);
 		}
-
-		if (!$parameters) {
-			$parameters = array();
-		} else if (!is_array($parameters)) {
-			error_log("Parameters must be an array\n");
-			return false;
-		}
-
-		$parameters["method"] = $method;
-
-		$handle = curl_init($this->_url());
-		curl_setopt($handle, CURLOPT_RETURNTRANSFER, true);
-		curl_setopt($handle, CURLOPT_CONNECTTIMEOUT, 5);
-		curl_setopt($handle, CURLOPT_TIMEOUT, 60);
-		curl_setopt($handle, CURLOPT_POSTFIELDS, json_encode($parameters));
-		curl_setopt($handle, CURLOPT_HTTPHEADER, array("Content-Type: application/json"));
 
 		return $this->exec_curl_request($handle);
 	}
