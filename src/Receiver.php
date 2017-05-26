@@ -375,7 +375,7 @@ class Receiver {
 				if($csel[0] != "/"){ $csel = "/" .$csel; }
 				$csel = strtolower($csel);
 				if(in_array($csel, $cmds) && strpos($csel, "@") === FALSE){ return !($begin && !$initbegin); }
-				$name = $this->bot->username;
+				$name = strtolower($this->bot->username);
 				if($name){
 					if($name[0] != "@"){ $name = "@" .$name; }
 					$csel = $csel.$name;
