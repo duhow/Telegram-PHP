@@ -566,6 +566,7 @@ class Receiver {
 		return ( ($info === FALSE or in_array($info['status'], ['left', 'kicked'])) ? FALSE : $ret );
 	}
 
+	// TODO Join function and deprecate
 	function grouplink($text, $url = FALSE){
 		$link = "https://t.me/";
 		if($text[0] != "@" and strlen($text) == 22){
@@ -575,6 +576,11 @@ class Receiver {
 			else{ $link = $text; }
 		}
 		return $link;
+	}
+
+	function get_chat_link($chat = NULL){
+		if(empty($chat)){ $chat = $this->chat->id; }
+		return $this->send->get_chat_link($chat);
 	}
 
 	function answer_if_callback($text = "", $alert = FALSE){
@@ -693,6 +699,37 @@ class Receiver {
 		}
 		elseif($content === TRUE){ return $pin['text']; }
 		elseif($content === FALSE){  }
+	}
+
+	function user_can($action = NULL, $user = NULL, $chat = NULL){
+		if(empty($user)){ $user = $this->user->id; }
+		if(empty($chat)){ $chat = $this->chat->id; }
+		$data = $this->send->get_member_info($user, $chat);
+
+		$can = [
+			'can_be_edited', 'can_change_info',
+			'can_post_messages', 'can_edit_messages',
+			'can_delete_messages', 'can_invite_users',
+			'can_restrict_members', 'can_pin_messages',
+			'can_promote_members', 'can_send_messages',
+			'can_send_media_messages', 'can_send_other_messages',
+			'can_add_web_page_previews'
+		];
+
+		// Return all results.
+		if($action === TRUE or $action === NULL){
+			$final = array();
+			foreach($can as $c){
+				if(isset($data['result'][$c])){ $final[$c] = $data['result'][$c]; }
+			}
+			return $final;
+		}
+
+		if(strpos($action, "can_") === FALSE){ $action = "can_" .$action; }
+		$action = strtolower($action);
+
+		if(!isset($data['result'][$action])){ return NULL; }
+		return (bool) $data['result'][$action];
 	}
 
 	function download($file_id, $path = NULL){

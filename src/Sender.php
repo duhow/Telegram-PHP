@@ -292,6 +292,7 @@ class Sender {
 	function get_admins($chat = NULL, $keep = FALSE){ return $this->_parse_generic_chatFunctions("getChatAdministrators", $keep, $chat); }
 	function get_member_info($user = NULL, $chat = NULL, $keep = FALSE){ return $this->_parse_generic_chatFunctions("getChatMember", $keep, $chat, $user); }
 	function get_members_count($chat = NULL, $keep = FALSE){ return $this->_parse_generic_chatFunctions("getChatMembersCount", $keep, $chat); }
+	function get_chat_link($chat = NULL, $keep = FALSE){ return $this->_parse_generic_chatFunctions("exportChatInviteLink", $keep, $chat); }
 	function get_user_avatar($user = NULL, $offset = NULL, $limit = 100){
 		if(!empty($user)){ $this->content['user_id'] = $user; }
 		$this->content['offset'] = $offset;
@@ -301,6 +302,24 @@ class Sender {
 		$res = $this->send($keep);
 		if(!isset($res['photos']) or empty($res['photos'])){ return FALSE; }
 		return $res['photos'];
+	}
+
+	function set_title($text){
+		$this->method = "setChatTitle";
+		$this->content['title'] = $text;
+		return $this->send();
+	}
+
+	function set_description($text = ""){
+		$this->method = "setChatDescription";
+		$this->content['description'] = $text;
+		return $this->send();
+	}
+
+	function pin_message($message = NULL){
+		// TODO
+		// Ver si está puesto el Message ID,
+		// Si es NULL o FALSE, borrar.
 	}
 
 	// DEBUG
