@@ -38,6 +38,7 @@ class Sender {
 	}
 
 	function chat($id = NULL){
+		if(empty($id)){ return $this->content['chat_id']; }
 		if($id === TRUE && $this->parent instanceof \Telegram\Receiver){ $id = $this->parent->chat->id; }
 		$this->content['chat_id'] = $id;
 		return $this;
@@ -71,7 +72,7 @@ class Sender {
 	}
 
 	function file($type, $file, $caption = NULL, $keep = FALSE){
-		if(!in_array($type, ["photo", "audio", "voice", "document", "sticker", "video", "video_note", "videonote"])){ return FALSE; }
+		if(!in_array($type, ["photo", "chatphoto", "audio", "voice", "document", "sticker", "video", "video_note", "videonote"])){ return FALSE; }
 
 		$url = FALSE;
 		if(filter_var($file, FILTER_VALIDATE_URL) !== FALSE){
@@ -86,6 +87,9 @@ class Sender {
 		if(in_array($type, ["videonote", "video_note"])){
 			$type = "video_note";
 			$this->method = "sendVideoNote";
+		}elseif($type == "chatphoto"){
+			$type = "photo";
+			$this->method = "sendChatPhoto";
 		}
 		if(file_exists(realpath($file))){
 			$this->content[$type] = new \CURLFile(realpath($file));
@@ -261,9 +265,9 @@ class Sender {
 	}
 
 	function forward_to($chat_id_to){
-		if(empty($this->content['chat_id']) or empty($this->content['message_id'])){ return $this; }
-		$this->content['from_chat_id'] = $this->content['chat_id'];
-		$this->content['chat_id'] = $chat_id_to;
+		if(empty($this->chat()) or empty($this->content['message_id'])){ return $this; }
+		$this->content['from_chat_id'] = $this->chat();
+		$this->chat($chat_id_to);
 		$this->method = "forwardMessage";
 
 		return $this;
@@ -280,9 +284,46 @@ class Sender {
 		return $this;
 	}
 
+	function until_date($until){
+		if(!is_numeric($until) and strtotime($until) !== FALSE){ $until = strtotime($until); }
+		$this->content['until_date'] = $until;
+		return $this;
+	}
+
 	function kick($user = NULL, $chat = NULL, $keep = FALSE){
 				$this->ban($user, $chat, $keep);
 		return  $this->unban($user, $chat, $keep);
+	}
+
+	function restrict($option = NULL, $user = NULL, $chat = NULL){
+		if(!empty($option) and strpos($option, "can_") === FALSE){ $option = "can_" . strtolower($option); }
+		$this->method = "restrictChatMember";
+
+		/* send_messages, send_media_messages,
+		send_other_messages, add_web_page_previews */
+
+		if($option == "can_none"){ // restrict none
+			$this->content['can_send_other_messages'] = TRUE;
+			$this->content['can_add_web_page_previews'] = TRUE;
+		}elseif($option == "can_all"){ // restrict all = ban
+			return $this->ban($user, $chat);
+		}elseif(!empty($option)){
+			$this->content[$option] = TRUE;
+		}
+
+		return $this->send();
+	}
+
+	function restrict_until($until, $option = NULL, $user = NULL, $chat = NULL){
+		return $this
+			->until_date($until)
+			->restrict($option, $user, $chat);
+	}
+
+	function ban_until($until, $user = NULL, $chat = NULL, $keep = FALSE){
+		return $this
+			->until_date($until)
+			->ban($user, $chat, $keep);
 	}
 
 	function ban($user = NULL, $chat = NULL, $keep = FALSE){ return $this->_parse_generic_chatFunctions("kickChatMember", $keep, $chat, $user); }
@@ -294,7 +335,7 @@ class Sender {
 	function get_members_count($chat = NULL, $keep = FALSE){ return $this->_parse_generic_chatFunctions("getChatMembersCount", $keep, $chat); }
 	function get_chat_link($chat = NULL, $keep = FALSE){ return $this->_parse_generic_chatFunctions("exportChatInviteLink", $keep, $chat); }
 	function get_user_avatar($user = NULL, $offset = NULL, $limit = 100){
-		if(!empty($user)){ $this->content['user_id'] = $user; }
+		if(!empty($user)){ $this->user($user); }
 		$this->content['offset'] = $offset;
 		$this->content['limit'] = $limit;
 		$this->method = "getUserProfilePhotos";
@@ -316,10 +357,48 @@ class Sender {
 		return $this->send();
 	}
 
+	function set_photo($path = FALSE){
+		if($path === NULL or $path === FALSE){
+			$this->method = "deleteChatPhoto";
+			return $this->send();
+		}
+		return $this->file("chatphoto", $path);
+	}
+
+	function promote($vars, $user = NULL, $defval = TRUE){
+		if(!empty($user)){ $this->user($user); }
+		if(!is_array($vars)){ $vars = [$vars]; }
+
+		/* post_messages, edit_messages, delete_messages, pin_messages,
+		change_info, invite_users, restrict_members, promote_members */
+
+		$this->method = "promoteChatMember";
+		foreach($vars as $k => $v){
+			$key = (is_numeric($k) ? $v : $k);
+			$value = (!is_numeric($k) and is_bool($v) ? $v : $defval);
+
+			if(strpos($key, "can_") === FALSE){ $key = "can_" . $key; }
+			$key = strtolower($key);
+
+			$this->content[$key] = (bool) $value;
+		}
+
+		return $this;
+	}
+
+	// Alias for promote but negative
+	function demote($vars, $user = NULL){ return $this->promote($vars, $user, FALSE); }
+
 	function pin_message($message = NULL){
-		// TODO
-		// Ver si está puesto el Message ID,
-		// Si es NULL o FALSE, borrar.
+		$this->method = "pinChatMessage";
+
+		if($message === FALSE){
+			$this->method = "un" . $this->method; // unpin
+			return $this->send();
+		}
+
+		if(!empty($message)){ $this->message($message); }
+		return $this->send();
 	}
 
 	// DEBUG
@@ -393,7 +472,7 @@ class Sender {
 	}
 
 	function game_score($user, $score = NULL, $force = FALSE, $edit_message = TRUE){
-		$this->content['user_id'] = $user;
+		$this->user($user);
 
 		if($score == NULL){
 			$this->method = "getGameHighScores";
@@ -430,7 +509,7 @@ class Sender {
 			if(in_array(strtoupper($keep), ["POST", "POSTKEEP"])){ $keep = "POSTKEEP"; }
 			else{ $keep = TRUE; }
 			foreach($this->broadcast as $chat){
-				$this->content['chat_id'] = $chat;
+				$this->chat($chat);
 				// Send and keep data
 				$result[] = $this->send($keep, TRUE);
 			}
@@ -438,7 +517,7 @@ class Sender {
 		}
 
 		if(empty($this->method)){ return FALSE; }
-		if(empty($this->content['chat_id']) && $this->parent instanceof Receiver){ $this->content['chat_id'] = $this->parent->chat->id; }
+		if(empty($this->chat()) && $this->parent instanceof Receiver){ $this->chat($this->parent->chat->id); }
 
 		$post = FALSE;
 
@@ -460,8 +539,8 @@ class Sender {
 		}else{
 			if(empty($user) && empty($chat) && (empty($this->chat()) or empty($this->user()))){ return FALSE; }
 		}
-		if(!empty($chat)){ $this->content['chat_id'] = $chat; }
-		if(!empty($user)){ $this->content['user_id'] = $user; }
+		if(!empty($chat)){ $this->chat($chat); }
+		if(!empty($user)){ $this->user($user); }
 		return $this->send($keep);
 		// return $this;
 	}
