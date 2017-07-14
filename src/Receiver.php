@@ -95,9 +95,7 @@ class Receiver {
 						$this->reply->forward_from_chat = new Chat($this->data[$this->key]['reply_to_message']['forward_from_chat']);
 					}
 				}
-				// Comprobar, porque esto sólo es cierto si viene de un channel.
-				// El correcto sería forward_from Y forward_from_chat
-				if(isset($this->data[$this->key]['forward_from_chat'])){
+				if(isset($this->data[$this->key]['forward_from']) or isset($this->data[$this->key]['forward_from_chat'])){
 					$this->has_forward = TRUE;
 				}
 				if(isset($this->data[$this->key]['new_chat_members'])){
