@@ -13,11 +13,13 @@ class Sender {
 	private $_keyboard;
 	private $_inline;
 	private $_payment;
+	private $_sticker;
 
 	function __construct($uid = NULL, $key = NULL, $name = NULL){
 		$this->_keyboard = new \Telegram\Keyboards\Keyboard($this);
 		$this->_inline = new \Telegram\Keyboards\InlineKeyboard($this);
 		$this->_payment = new \Telegram\Payments\Stripe($this);
+		$this->_sticker = new \Telegram\Sticker($this);
 
 		if(!empty($uid)){
 			if($uid instanceof Receiver){
@@ -53,6 +55,7 @@ class Sender {
 
 	function user($id = NULL){
 		if(empty($id)){ return $this->content['user_id']; }
+		elseif($id === TRUE){ $id = $this->parent->user->id; }
 		$this->content['user_id'] = $id;
 		return $this;
 	}
@@ -216,6 +219,10 @@ class Sender {
 	function payment($provider = "Stripe"){
 		$this->_payment = new \Telegram\Payments\Stripe($this);
 		return $this->_payment;
+	}
+	function sticker($id = NULL){
+		if(!empty($id)){ return $this->file('sticker', $id); }
+		return $this->_sticker;
 	}
 
 	function payment_precheckout($id, $ok = TRUE){
@@ -489,6 +496,11 @@ class Sender {
 
 	function _push($key, $val){
 		$this->content[$key] = $val;
+		return $this;
+	}
+
+	function _push_method($name){
+		$this->method = $name;
 		return $this;
 	}
 
