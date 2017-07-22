@@ -17,7 +17,7 @@ $files = [
 	'Elements/Voice.php', // REQUIRED for priority
 ];
 
-foreach(scandir('Elements/') as $file){
+foreach(scandir($dir .'Elements/') as $file){
 	if(substr($file, -4) != ".php"){ continue; }
 	$files[] = 'Elements/' .$file;
 }
