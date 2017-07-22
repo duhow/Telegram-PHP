@@ -11,7 +11,7 @@ class InlineKeyboard {
 		$this->parent = $parent;
 	}
 
-	function row(){ return new InlineKeyboardRow($this); }
+	function row(){ return new InlineKeyboardRow($this, $this->parent->bot); }
 	function row_button($text, $request = NULL, $switch = NULL){
 		return $this->row()
 			->button($text, $request, $switch)
@@ -41,9 +41,11 @@ class InlineKeyboard {
 class InlineKeyboardRow {
 	private $buttons;
 	private $parent;
+	private $bot;
 
-	function __construct($parent){
+	function __construct($parent, $bot = NULL){
 		$this->parent = $parent;
+		if(!empty($bot)){ $this->bot = $bot; }
 	}
 
 	function button($text, $request = NULL, $switch = NULL){

@@ -40,7 +40,10 @@ class Sender {
 	}
 
 	function chat($id = NULL){
-		if(empty($id)){ return $this->content['chat_id']; }
+		if(empty($id)){
+			if(isset($this->content['chat_id'])){ return $this->content['chat_id'];
+			$id = TRUE; // HACK ?
+		}
 		if($id === TRUE && $this->parent instanceof \Telegram\Receiver){ $id = $this->parent->chat->id; }
 		$this->content['chat_id'] = $id;
 		return $this;
