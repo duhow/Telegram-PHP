@@ -2,29 +2,31 @@
 
 $dir = dirname(__FILE__) .'/';
 $files = [
-	$dir .'User.php',
-	$dir .'Chat.php',
-	$dir .'Bot.php',
+	'User.php',
+	'Chat.php',
+	'Bot.php',
 
-	$dir .'Keyboards/Keyboard.php',
-	$dir .'Keyboards/InlineKeyboard.php',
+	'Keyboards/Keyboard.php',
+	'Keyboards/InlineKeyboard.php',
 
-	$dir .'Payments/Stripe.php',
+	'Payments/Stripe.php',
 
-	$dir .'Elements/Base.php',
-	$dir .'Elements/Voice.php', // REQUIRED for priority
+	'Sticker.php',
+
+	'Elements/Base.php',
+	'Elements/Voice.php', // REQUIRED for priority
 ];
 
-foreach(scandir($dir .'Elements/') as $file){
+foreach(scandir('Elements/') as $file){
 	if(substr($file, -4) != ".php"){ continue; }
-	$files[] = $dir .'Elements/' .$file;
+	$files[] = 'Elements/' .$file;
 }
 
-$files[] = $dir .'Receiver.php';
-$files[] = $dir .'Sender.php';
+$files[] = 'Receiver.php';
+$files[] = 'Sender.php';
 
 foreach($files as $file){
-	require_once $file;
+	require_once $dir .$file;
 }
 
 unset($dir);
