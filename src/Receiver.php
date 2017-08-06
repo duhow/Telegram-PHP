@@ -617,16 +617,18 @@ class Receiver {
 		if($object === TRUE){ return (object) $data; }
 		elseif($object === FALSE){ return array_values($data); }
 
-		if(in_array($key, ["document", "location"])){ return $data; }
+		if(in_array($key, ["document", "location", "game"])){ return $data; }
 		return $data[$rkey];
 	}
 
 	function document($object = TRUE){ return $this->_generic_content('document', $object); }
 	function location($object = TRUE){ return $this->_generic_content('location', $object); }
+	function audio($object = NULL){ return $this->_generic_content('audio', $object); }
 	function voice($object = NULL){ return $this->_generic_content('voice', $object); }
  	function video($object = NULL){ return $this->_generic_content('video', $object); }
 	function video_note($object = NULL){ return $this->_generic_content('video_note', $object); }
 	function sticker($object = NULL){ return $this->_generic_content('sticker', $object); }
+	function game($object = TRUE){ return $this->_generic_content('game', $object); }
 
 	function gif(){
 		$gif = $this->document(TRUE);
