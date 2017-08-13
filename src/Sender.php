@@ -10,6 +10,7 @@ class Sender {
 	private $method = NULL;
 	private $broadcast = NULL;
 	private $language = "en";
+	public  $convert_emoji = TRUE; // Default
 	private $_keyboard;
 	private $_inline;
 	private $_payment;
@@ -183,6 +184,7 @@ class Sender {
 			}
 		}
 
+		if($this->convert_emoji){ $text = $this->parent->emoji($text); }
 		$this->content['text'] = $text;
 		$this->method = "sendMessage";
 		if($type === TRUE){ $this->content['parse_mode'] = 'Markdown'; }
@@ -358,12 +360,14 @@ class Sender {
 
 	function set_title($text){
 		$this->method = "setChatTitle";
+		if($this->convert_emoji){ $text = $this->parent->emoji($text); }
 		$this->content['title'] = $text;
 		return $this->send();
 	}
 
 	function set_description($text = ""){
 		$this->method = "setChatDescription";
+		if($this->convert_emoji){ $text = $this->parent->emoji($text); }
 		$this->content['description'] = $text;
 		return $this->send();
 	}
@@ -432,6 +436,7 @@ class Sender {
 			}
 			if(empty($id)){ return $this; } // HACK
 			$this->content['callback_query_id'] = $id;
+			if($this->convert_emoji){ $text = $this->parent->emoji($text); }
 			$this->content['text'] = $text;
 			$this->content['show_alert'] = $alert;
 			$this->method = "answerCallbackQuery";

@@ -50,6 +50,7 @@ class InlineKeyboardRow {
 
 	function button($text, $request = NULL, $switch = NULL){
 		$data = array();
+		if($this->parent->convert_emoji){ /* TODO */ }
 		$data['text'] = $text;
 		if(filter_var($request, FILTER_VALIDATE_URL) !== FALSE){ $data['url'] = $request; }
 		elseif($switch === TRUE or (is_string($switch) && strtolower($switch) == "command")){

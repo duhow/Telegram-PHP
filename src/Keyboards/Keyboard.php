@@ -67,6 +67,7 @@ class KeyboardRow {
 
 	function button($text, $request = NULL){
 		$data = array();
+		if($this->parent->convert_emoji){ /* TODO */ }
 		$data['text'] = $text;
 		if($request === TRUE or $request == "contact"){ $data['request_contact'] = TRUE; }
 		elseif($request === FALSE or $request == "location"){ $data['request_location'] = TRUE; }
