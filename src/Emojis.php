@@ -1148,6 +1148,10 @@
 ':check:' => "\u{2705}",
 ':times:' => "\u{274c}",
 ':clock:' => "\u{1f551}", // Clock 2
+':world:' => "\u{1f30d}", // Europe
+':world-europe:' => "\u{1f30d}",
+':world-usa:' => "\u{1f30e}",
+':world-asia:' => "\u{1f30f}",
 
 ':love:' => "\u{2764}",
 ':heart-red:' => "\u{2764}",
