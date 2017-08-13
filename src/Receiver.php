@@ -291,7 +291,7 @@ class Receiver {
 			$text = str_replace(array_keys($vowels), array_values($vowels), $text);
 		}
 		$repls = [
-			'/\{N:(\w+)\}/i' => '(?P<$1>[^\\d]+)',
+			'/\{N:(\w+)\}/i' => '(?P<$1>[\\d]+)',
 			'/\{S:(\w+)\}/i' => '(?P<$1>[\\w\\s?]+)',
 			'/\{SL:(.+):(\w+)\}/i' => '(?P<$2>[\\w\\s?]+)$1',
 			'/\{(\w+)\}/i'   => '(?P<$1>[^\\s]+)',
