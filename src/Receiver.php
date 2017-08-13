@@ -46,6 +46,7 @@ class Receiver {
 	public $callback = FALSE;
 	public $send = FALSE; // Class
 	public $migrate_chat = NULL;
+	public $input = NULL; // Text Regex Match
 
 	function set_access($uid, $key = NULL, $name = NULL){
 		$this->bot = new Bot($uid, $key, $name);
@@ -281,15 +282,34 @@ class Receiver {
 		if(!is_array($expr)){ $expr = [$expr]; }
 		$text = $this->text();
 		if($cleanup){
-			$text = strtolower($text);
-			$text = str_replace(["á", "é", "í", "ó", "ú"], ["a", "e", "i", "o", "u"], $text); // HACK
-			$text = str_replace(["Á", "É", "Í", "Ó", "Ú"], ["A", "E", "I", "O", "U"], $text); // HACK
-			$text = str_replace("%20", " ", $text); // HACK web
-			$text = strtolower($text); // HACK Twice
+			$vowels = [
+				"á" => "a", "é" => "e", "í" => "i", "ó" => "o", "ú" => "u",
+				"Á" => "A", "É" => "E", "Í" => "I", "Ó" => "O", "Ú" => "U",
+				"%20" => " " // HACK
+			];
+			$text = str_replace(array_keys($vowels), array_values($vowels), $text);
 		}
+		$repls = [
+			'/\{N:(\w+)\}/i' => '(?P<$1>[^\\d]+)',
+			'/\{S:(\w+)\}/i' => '(?P<$1>[\\w\\s?]+)',
+			'/\{SL:(.+):(\w+)\}/i' => '(?P<$2>[\\w\\s?]+)$1',
+			'/\{(\w+)\}/i'   => '(?P<$1>[^\\s]+)',
+		];
+
 		foreach($expr as $ex){
-			$r = preg_match($ex, $text);
-			if($r){ return $r; }
+			$ex = preg_replace(array_keys($repls), array_values($repls), $ex);
+			$r = preg_match_all("/$ex/i", $text, $matches);
+			if($r){
+				foreach($matches as $k => $v){
+					if(is_numeric($k) and $k != 0){
+						unset($matches[$k]);
+						continue;
+					}
+					$matches[$k] = current($v); // Get value, not array
+				}
+				$this->input = (object) $matches;
+				return $r;
+			}
 		}
 		return FALSE;
 	}
