@@ -415,8 +415,8 @@ class Sender {
 	// DEBUG
 	/* function get_message($message, $chat = NULL){
 		$this->method = 'getMessage';
-		if(empty($chat) && !isset($this->context['chat_id'])){
-			$this->context['chat_id'] = $this->parent->chat->id;
+		if(empty($chat) && !isset($this->content['chat_id'])){
+			$this->content['chat_id'] = $this->parent->chat->id;
 		}
 
 		return $this->send();
@@ -456,7 +456,7 @@ class Sender {
 	}
 
 	function delete($message = NULL, $chat = NULL){
-		if($message === TRUE or (empty($message) && !isset($this->context['message_id']))){
+		if($message === TRUE or (empty($message) && !isset($this->content['message_id']))){
 			$this->message(TRUE);
 		}elseif(is_array($message) and isset($message["message_id"])){
 			$this->message($message["message_id"]);
@@ -464,7 +464,7 @@ class Sender {
 			$this->message($message);
 		}
 
-		if($message === TRUE or (empty($chat) && !isset($this->context['chat_id']))){
+		if($message === TRUE or (empty($chat) && !isset($this->content['chat_id']))){
 			$this->chat(TRUE);
 		}elseif(!empty($chat)){
 			$this->chat($chat);
