@@ -1082,28 +1082,79 @@
 ':like:' => "\u{1f44d}",
 ':dislike:' => "\u{1f44e}",
 ':-*' => "\u{1f618}", // Kiss heart
-':-)' => '\u{1f60a}', // Blush
-'8-)' => '\u{1f60d}', // Heart eyes
-'B-)' => '\u{1f192}', // Cool
-':-D' => '\u{1f603}', // Smiley
-';-)' => '\u{1f609}', // Wink
-';-P' => '\u{1f61c}', // Tongue wink
-':-p' => '\u{1f60b}', // Yum
-'3(' => '\u{1f614}', // Pensive
-':-(' => '\u{1f61e}', // Disappointed
-':]' => '\u{1f60f}', // Smirk
-':\'(' => '\u{1f622}', // Cry
-':_(' => '\u{1f62d}', // Sob
-':((' => '\u{1f629}', // Weary
-':o' => '\u{1f628}', // Fearful
-':|' => '\u{1f610}', // Neutral face
-'3-)' => '\u{1f60c}', // Relieved
-'>(' => '\u{1f620}', // Angry
-'>((' => '\u{1f621}', // Rage
-'O:)' => '\u{1f607}', // Innocent
-';o' => '\u{1f630}', // Cold sweat
-'8|' => '\u{1f633}', // Flushed
-'8o' => '\u{1f632}', // Astonished
-':X' => '\u{1f637}', // Mask
-'}:)' => '\u{1f608}', // Smiling Imp
+':-)' => "\u{1f60a}", // Blush
+'8-)' => "\u{1f60d}", // Heart eyes
+'B-)' => "\u{1f192}", // Cool
+':-D' => "\u{1f603}", // Smiley
+';-)' => "\u{1f609}", // Wink
+';-P' => "\u{1f61c}", // Tongue wink
+':-p' => "\u{1f60b}", // Yum
+'3(' => "\u{1f614}", // Pensive
+':-(' => "\u{1f61e}", // Disappointed
+':]' => "\u{1f60f}", // Smirk
+':\'(' => "\u{1f622}", // Cry
+':_(' => "\u{1f62d}", // Sob
+':((' => "\u{1f629}", // Weary
+':o' => "\u{1f628}", // Fearful
+':|' => "\u{1f610}", // Neutral face
+'3-)' => "\u{1f60c}", // Relieved
+'>(' => "\u{1f620}", // Angry
+'>((' => "\u{1f621}", // Rage
+'O:)' => "\u{1f607}", // Innocent
+';o' => "\u{1f630}", // Cold sweat
+'8|' => "\u{1f633}", // Flushed
+'8o' => "\u{1f632}", // Astonished
+':X' => "\u{1f637}", // Mask
+'}:)' => "\u{1f608}", // Smiling Imp
+
+// Custom
+':>' => "\u{1f603}", // Smiley
+']:D' => "\u{1f603}", // Smiley
+'^3^' => "\u{1f619}", // Kissing face with smiling eyes
+':lol:' => "\u{1f602}", // Joy
+':\'D' => "\u{1f602}", // Joy
+'>X' => "\u{1f635}", // Dizzy
+':die:' => "\u{1f635}", // Dizzy
+':sun:' => "\u{2600}",
+
+':orange:' => "\u{1f34a}", // Tangerine
+':apple-red:' => "\u{1f34e}",
+':birthcake:' => "\u{1f382}", // Birthday
+
+'[1]' => "1\u{20e3}",
+'[2]' => "2\u{20e3}",
+'[3]' => "3\u{20e3}",
+'[4]' => "4\u{20e3}",
+'[5]' => "5\u{20e3}",
+'[6]' => "6\u{20e3}",
+'[7]' => "7\u{20e3}",
+'[8]' => "8\u{20e3}",
+'[9]' => "9\u{20e3}",
+'[0]' => "0\u{20e3}",
+
+':medal-1:' => "\u{1f947}",
+':medal-2:' => "\u{1f948}",
+':medal-3:' => "\u{1f949}",
+':bronce:' => "\u{1f947}",
+':bronze:' => "\u{1f947}",
+':silver:' => "\u{1f948}",
+':golden:' => "\u{1f949}",
+
+':medal-gold:' => "\u{1f3c5}", // Sports medal
+':medal-star:' => "\u{1f396}", // Militar medal
+':medal-sports:' => "\u{1f3c5}",
+':medal-militar:' => "\u{1f396}",
+
+':check:' => "\u{2705}",
+':times:' => "\u{274c}",
+':clock:' => "\u{1f551}", // Clock 2
+
+':love:' => "\u{2764}",
+':heart-red:' => "\u{2764}",
+':heart-blue:' => "\u{1f499}",
+':heart-green:' => "\u{1f49a}",
+':heart-yellow:' => "\u{1f49b}",
+':heart-purple:' => "\u{1f49c}",
+':heart-black:' => "\u{1f5a4}",
+
 ); ?>
