@@ -94,7 +94,9 @@ class Receiver {
 					$this->reply_is_forward = (isset($this->data[$this->key]['reply_to_message']['forward_from']));
 					if($this->reply_is_forward){
 						$this->reply->forward_from = new User($this->data[$this->key]['reply_to_message']['forward_from']);
-						$this->reply->forward_from_chat = new Chat($this->data[$this->key]['reply_to_message']['forward_from_chat']);
+						if(isset($this->data[$this->key]['reply_to_message']['forward_from_chat'])){
+							$this->reply->forward_from_chat = new Chat($this->data[$this->key]['reply_to_message']['forward_from_chat']);
+						}
 					}
 				}
 				if(isset($this->data[$this->key]['forward_from']) or isset($this->data[$this->key]['forward_from_chat'])){
