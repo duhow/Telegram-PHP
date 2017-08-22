@@ -44,5 +44,48 @@ if($tg->text_has("are you alive")){
 }
 ```
 
+**NEW:** To parse a string:
+```php
+if($tg->text_regex("I'm {N:age}") and $tg->words() <= 4){
+  $num = $tg->input->age;
+  $str = "So old...";
+  if($num < 18){ $str = "You're young!";
+  $tg->send
+    ->text($str)
+  ->send();
+}elseif($tg->text_regex("My name's {name}")){
+  $tg->send
+    ->text("Nice to meet you, " .$tg->input->name ."!")
+  ->send();
+}
+```
+
+Send an Inline Keyboard and parse it:
+```php
+if($tg->callback == "but 1"){
+  $tg->answer_if_callback(""); // Stop loading button.
+  $tg->send
+    ->message(TRUE)
+    ->chat(TRUE)
+    ->text("You pressed the first button!")
+  ->edit("text");
+}elseif($tg->callback == "but 2"){
+  $tg->answer_if_callback("You pressed the second button!", TRUE);
+  // Display an alert and stop loading button.
+}
+
+if($tg->text_has("matrix") and $tg->words() <= 5){
+  $tg->send
+    ->text("Red or blue. You choose.")
+    ->inline_keyboard()
+      ->row()
+        ->button("Red", "but 1")
+        ->button("Blue", "but 2)
+      ->end_row()
+    ->show()
+  ->send();
+}
+```
+
 # Examples
 - [Profesor Oak](https://github.com/duhow/ProfesorOak), an assistant for Pokemon GO.
