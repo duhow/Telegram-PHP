@@ -22,6 +22,9 @@ class User {
 			$this->bot = $first_name;
 		}
 
+		$first_name = str_replace("\u{202e}", "", $first_name);
+		$last_name  = str_replace("\u{202e}", "", $last_name);
+
 		$this->id = intval($id);
 		$this->first_name = trim($first_name);
 		$this->username = trim($username);

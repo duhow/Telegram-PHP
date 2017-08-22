@@ -73,6 +73,12 @@ class Chat extends User {
 			$this->type = $type;
 		}
 
+		foreach(['first_name', 'last_name', 'title'] as $name){
+			if(!empty($this->{$name})){
+				$this->{$name} = str_replace("\u{202e}", "", $this->{$name});
+			}
+		}
+
 		if(!$this->is_group()){
 			$this->members = 2;
 			unset($this->all_members_are_administrators);
