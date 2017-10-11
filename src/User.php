@@ -8,10 +8,11 @@ class User {
 	public $last_name = NULL;
 	public $language_code = NULL;
 	public $username = NULL;
+	public $is_bot = FALSE;
 	protected $bot;
 	protected $extra = array();
 
-	function __construct($id, $first_name = NULL, $last_name = NULL, $username = NULL, $language_code = NULL){
+	function __construct($id, $first_name = NULL, $last_name = NULL, $username = NULL, $language_code = NULL, $is_bot = FALSE){
 		if(is_array($id)){
 			foreach($id as $k => $v){
 				$$k = $v;
@@ -20,6 +21,7 @@ class User {
 
 		if($first_name instanceof Bot){
 			$this->bot = $first_name;
+			$this->is_bot = TRUE;
 		}
 
 		$first_name = str_replace("\u{202e}", "", $first_name);
@@ -30,6 +32,10 @@ class User {
 		$this->username = trim($username);
 		$this->last_name = trim($last_name);
 		$this->language_code = trim($language_code);
+
+		/* if(!empty($this->username)){
+			$this->is_bot = (strtolower(substr($this->username, -3)) == "bot");
+		} */
 
 		return $this;
 	}

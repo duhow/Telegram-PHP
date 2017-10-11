@@ -11,7 +11,7 @@ class Chat extends User {
 	public $all_members_are_administrators = FALSE;
 
 	function is_group(){
-		return ($this->type != "private");
+		return (in_array($this->type, ["group", "supergroup"]));
 	}
 
 	function parse($bot, $full = FALSE){
@@ -66,6 +66,8 @@ class Chat extends User {
 	}
 
 	function __construct($id, $type = NULL){
+		unset($this->is_bot);
+
 		if(is_array($id)){
 			foreach($id as $k => $v){ $this->$k = $v; }
 		}else{
