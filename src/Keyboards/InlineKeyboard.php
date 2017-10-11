@@ -11,7 +11,30 @@ class InlineKeyboard {
 		$this->parent = $parent;
 	}
 
-	function row(){ return new InlineKeyboardRow($this, $this->parent->bot); }
+	function row($array = NULL){
+		if(!is_array($array)){ return new InlineKeyboardRow($this, $this->parent->bot); }
+		// ------
+		$row = new InlineKeyboardRow($this, $this->parent->bot);
+		foreach($array as $but){
+			$text = $but;
+			$request = $but;
+			$switch = NULL;
+			if(is_array($but)){
+				if(isset($but['text'])){ $text = $but['text']; }
+				elseif(isset($but[0])){ $text = $but[0]; }
+
+				if(isset($but['request'])){ $request = $but['request']; }
+				elseif(isset($but[1])){ $request = $but[1]; }
+
+				if(isset($but['switch'])){ $switch = $but['switch']; }
+				elseif(isset($but[2])){ $switch = $but[2]; }
+			}
+			$row->button($text, $request, $switch);
+		}
+		$row->end_row();
+		return $this;
+	}
+
 	function row_button($text, $request = NULL, $switch = NULL){
 		return $this->row()
 			->button($text, $request, $switch)

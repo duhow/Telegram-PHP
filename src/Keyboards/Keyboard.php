@@ -12,7 +12,17 @@ class Keyboard {
 		$this->parent = $parent;
 	}
 
-	function row(){ return new KeyboardRow($this); }
+	function row($array = NULL){
+		if(!is_array($array)){ return new KeyboardRow($this); }
+		// -------
+		$row = new KeyboardRow($this);
+		foreach($array as $v){
+			$row->button($v);
+		}
+		$row->end_row();
+		return $this;
+	}
+
 	function row_button($text, $request = NULL){
 		return $this->row()
 			->button($text, $request)
