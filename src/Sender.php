@@ -122,7 +122,8 @@ class Sender {
 		// return $this;
 	}
 
-	function location($lat, $lon = NULL){
+	function location($lat, $lon = NULL, $live_period = NULL){
+		if($live_period == NULL && $lon != NULL){ $live_period = $lon; }
 		if(is_array($lat) && $lon == NULL){ $lon = $lat[1]; $lat = $lat[0]; }
 		elseif(is_string($lat) && strpos($lat, ",") !== FALSE){
 			$lat = explode(",", $lat);
@@ -131,6 +132,12 @@ class Sender {
 		}
 		$this->content['latitude'] = $lat;
 		$this->content['longitude'] = $lon;
+		if(
+			is_numeric($live_period) && !is_float($live_period) &&
+			$live_period >= 60 && $live_period <= 86400
+		){
+			$this->content['live_period'] = (int) $live_period;
+		}
 		$this->method = "sendLocation";
 		return $this;
 	}
@@ -453,6 +460,10 @@ class Sender {
 			$this->method = "editMessageCaption";
 		}elseif(isset($this->content['inline_keyboard']) && in_array($type, ['keyboard', 'inline', 'markup'])){
 			$this->method = "editMessageReplyMarkup";
+		}elseif(isset($this->content['latitude']) && isset($this->content['longitude']) && in_array($type, ['location', 'livelocation'])){
+			$this->method = "editMessageLiveLocation";
+		}elseif(in_array($type, ['location', 'livelocation'])){
+			$this->method = "stopMessageLiveLocation";
 		}else{
 			return FALSE;
 		}
