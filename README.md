@@ -8,7 +8,7 @@ Another library to use Telegram bots with PHP.
 
 ```php
 $bot = new Telegram\Bot("11111111:AAAAAAAAAAzzzzzzzzzzzzzzzzzzz", "MyUserBot", "The Name of Bot");
-$tg = new Telegram\Receiver($bot);
+$tg  = new Telegram\Receiver($bot);
 ```
 
 You can create as many *Bots* and *Receivers* or *Senders* as you want.
@@ -49,7 +49,7 @@ if($tg->text_has("are you alive")){
 if($tg->text_regex("I'm {N:age}") and $tg->words() <= 4){
   $num = $tg->input->age;
   $str = "So old...";
-  if($num < 18){ $str = "You're young!";
+  if($num < 18){ $str = "You're young!"; }
   $tg->send
     ->text($str)
   ->send();
@@ -79,8 +79,8 @@ if($tg->text_has("matrix") and $tg->words() <= 5){
     ->text("Red or blue. You choose.")
     ->inline_keyboard()
       ->row()
-        ->button("Red", "but 1")
-        ->button("Blue", "but 2)
+        ->button("Red",  "but 1")
+        ->button("Blue", "but 2")
       ->end_row()
     ->show()
   ->send();
