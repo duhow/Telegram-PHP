@@ -238,6 +238,13 @@ class Sender {
 		return $this->_sticker;
 	}
 
+	function sticker_set($name, $chat = TRUE){
+		$this->chat($chat);
+		if(!empty($name)){ $this->content['sticker_set_name'] = $name; }
+		$this->method = (empty($name) ? "delete" : "set") ."ChatStickerSet";
+		return $this->send();
+	}
+
 	function payment_precheckout($id, $ok = TRUE){
 		$this->content['pre_checkout_query_id'] = $id;
 		if($ok === TRUE){
