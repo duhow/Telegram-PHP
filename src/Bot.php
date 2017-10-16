@@ -30,7 +30,7 @@ class Bot extends User {
 		}
 
 		$this->key = trim($key);
-		return parent::__construct($id, $first_name, NULL, $username);
+		return parent::__construct($id, $first_name, NULL, $username, NULL, TRUE);
 	}
 
 	/* function info(){

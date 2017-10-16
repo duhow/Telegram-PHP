@@ -32,6 +32,7 @@ class User {
 		$this->username = trim($username);
 		$this->last_name = trim($last_name);
 		$this->language_code = trim($language_code);
+		$this->is_bot = (bool) $is_bot;
 
 		/* if(!empty($this->username)){
 			$this->is_bot = (strtolower(substr($this->username, -3)) == "bot");
@@ -40,27 +41,29 @@ class User {
 		return $this;
 	}
 
-	function avatar($id = NULL){
+	public function avatar($id = NULL){
 		// group or user, if not already get, get info
 		// and save to self variable
 	}
 
-	function info($bot = NULL){
-		if(!empty($this->bot) && empty($bot)){ $bot = $this->bot;}
+	public function info($bot = NULL){
+		if(!empty($this->bot) && empty($bot)){ $bot = $this->bot; }
 		$send = new Sender($bot);
 		$info = $send->get_chat($this->id);
 		return $this->__construct($info);
 	}
 
-	function __toString(){
+	public function link(){
+		return "tg://user?id=" .$this->id;
+	}
+
+	public function __toString(){
 		return $this->first_name ." " .$this->last_name;
 	}
 
-	function __get($k){
+	public function __get($k){
 		if(isset($this->$k)){ return $this->$k; }
-		if(array_key_exists($k, $this->extra)) {
-            return $this->extra[$k];
-        }
+		if(array_key_exists($k, $this->extra)){ return $this->extra[$k]; }
 		return NULL;
 	}
 

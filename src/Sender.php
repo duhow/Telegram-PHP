@@ -10,6 +10,7 @@ class Sender {
 	private $method = NULL;
 	private $broadcast = NULL;
 	private $language = "en";
+	private $timeout = 0;
 	public  $convert_emoji = TRUE; // Default
 	private $_keyboard;
 	private $_inline;
@@ -46,6 +47,7 @@ class Sender {
 			$id = TRUE; // HACK ?
 		}
 		if($id === TRUE && $this->parent instanceof \Telegram\Receiver){ $id = $this->parent->chat->id; }
+		elseif($id instanceof Chat or $id instanceof User){ $id = $id->id; }
 		$this->content['chat_id'] = $id;
 		return $this;
 	}
@@ -60,6 +62,7 @@ class Sender {
 	function user($id = NULL){
 		if(empty($id)){ return $this->content['user_id']; }
 		elseif($id === TRUE){ $id = $this->parent->user->id; }
+		elseif($id instanceof User){ $id = $id->id; }
 		$this->content['user_id'] = $id;
 		return $this;
 	}
@@ -543,6 +546,9 @@ class Sender {
 	}
 
 	function send($keep = FALSE, $_broadcast = FALSE){
+		if($this->timeout > time()){
+			sleep($this->timeout - time());
+		}
 		if(!empty($this->broadcast) and !$_broadcast){
 			$result = array();
 			if(in_array(strtoupper($keep), ["POST", "POSTKEEP"])){ $keep = "POSTKEEP"; }
@@ -625,7 +631,11 @@ class Sender {
 		} else if ($http_code != 200) {
 			$response = json_decode($response, true);
 			error_log("Request has failed with error {$response['error_code']}: {$response['description']}\n");
-			if ($http_code == 401) {
+			if ($http_code == 429) {
+				if(isset($response['parameters']['retry_after'])){
+					$this->timeout = time() + (int) $response['parameters']['retry_after'];
+				}
+			} else if ($http_code == 401) {
 				throw new \Exception('Invalid access token provided');
 			}
 			return false;

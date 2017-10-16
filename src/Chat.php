@@ -10,11 +10,13 @@ class Chat extends User {
 	public $creator = NULL;
 	public $all_members_are_administrators = FALSE;
 
-	function is_group(){
-		return (in_array($this->type, ["group", "supergroup"]));
+	public function is_group($or_channel = TRUE){
+		if($this->type == "private"){ return FALSE; }
+		if($this->type == "channel" and !$or_channel){ return FALSE; }
+		return TRUE; // group / supergroup
 	}
 
-	function parse($bot, $full = FALSE){
+	public function parse($bot, $full = FALSE){
 		if(is_bool($bot)){
 			// Flip if needed
 			$tmp = $bot;
@@ -29,7 +31,7 @@ class Chat extends User {
 		}
 	}
 
-	function admins($bot = NULL){
+	public function admins($bot = NULL){
 		if(!empty($this->admins) or empty($bot)){ return $this->admins; }
 		$send = new Sender($bot);
 		$admins = $send->get_admins($this->id);
@@ -42,17 +44,17 @@ class Chat extends User {
 		return $this->admins;
 	}
 
-	function count($bot = NULL){
+	public function count($bot = NULL){
 		if(!empty($this->members) or empty($bot)){ return $this->members; }
 		$send = new Sender($bot);
 		$this->members = $send->get_members_count($this->id);
 		return $this->members;
 	}
 
-	function ban($user, $bot){ return $this->__admin_user_kick($user, $bot, 'ban'); }
-	function kick($user, $bot){ return $this->__admin_user_kick($user, $bot, 'kick'); }
-	function unban($user, $bot){ return $this->__admin_user_kick($user, $bot, 'unban'); }
-	function __admin_user_kick($user, $bot, $action){
+	public function ban($user, $bot){ return $this->__admin_user_kick($user, $bot, 'ban'); }
+	public function kick($user, $bot){ return $this->__admin_user_kick($user, $bot, 'kick'); }
+	public function unban($user, $bot){ return $this->__admin_user_kick($user, $bot, 'unban'); }
+	private function __admin_user_kick($user, $bot, $action){
 		// Flip if needed
 		if($user instanceof Bot){
 			$tmp = $bot;
@@ -65,7 +67,15 @@ class Chat extends User {
 		return $send->$action($user, $this->id);
 	}
 
-	function __construct($id, $type = NULL){
+	public function link($bot = NULL){
+		if(isset($this->username) and !empty($this->username)){
+			return "https://t.me/" .$this->username;
+		}
+		$send = new Sender($bot);
+		return $send->get_chat_link($this->id);
+	}
+
+	public function __construct($id, $type = NULL){
 		unset($this->is_bot);
 
 		if(is_array($id)){
@@ -81,7 +91,7 @@ class Chat extends User {
 			}
 		}
 
-		if(!$this->is_group()){
+		if($this->type == "private"){
 			$this->members = 2;
 			unset($this->all_members_are_administrators);
 			unset($this->title);
@@ -92,8 +102,8 @@ class Chat extends User {
 		return $this;
 	}
 
-	function __toString(){
-		if($this->is_group()){ return  $this->title; } // Group
+	public function __toString(){
+		if($this->type != "private"){ return  $this->title; } // Group or channel
 		return ($this->first_name ." " .$this->last_name); // User
 	}
 }
