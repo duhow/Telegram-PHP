@@ -12,7 +12,7 @@ class User {
 	protected $bot;
 	protected $extra = array();
 
-	function __construct($id, $first_name = NULL, $last_name = NULL, $username = NULL, $language_code = NULL, $is_bot = FALSE){
+	public function __construct($id, $first_name = NULL, $last_name = NULL, $username = NULL, $language_code = NULL, $is_bot = FALSE){
 		if(is_array($id)){
 			foreach($id as $k => $v){
 				$$k = $v;
@@ -67,7 +67,7 @@ class User {
 		return NULL;
 	}
 
-	function __set($k, $v){
+	public function __set($k, $v){
 		if(isset($this->$k)){ $this->$k = $v; }
 		else{ $this->extra[$k] = $v; }
 	}

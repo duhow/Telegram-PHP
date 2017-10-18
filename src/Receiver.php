@@ -4,7 +4,7 @@ namespace Telegram;
 
 class Receiver {
 
-	function __construct($uid = NULL, $key = NULL, $name = NULL){
+	public function __construct($uid = NULL, $key = NULL, $name = NULL){
 		$this->user = new User(NULL);
 		$this->chat = new Chat(NULL);
 
@@ -49,7 +49,7 @@ class Receiver {
 	public $input = NULL; // Text Regex Match
 	public $emojis = array();
 
-	function set_access($uid, $key = NULL, $name = NULL){
+	private function set_access($uid, $key = NULL, $name = NULL){
 		$this->bot = new Bot($uid, $key, $name);
 
 		// Set sender
@@ -57,7 +57,7 @@ class Receiver {
 		return $this;
 	}
 
-	function process($content = NULL){
+	public function process($content = NULL){
 		if($content === NULL){
 			$content = file_get_contents("php://input");
 		}
@@ -158,13 +158,13 @@ class Receiver {
 		}
 	}
 
-	function text_message(){
+	public function text_message(){
 		if($this->key == "callback_query"){ return $this->data[$this->key]['message']['text']; }
 		elseif($this->has_reply){ return $this->data[$this->key]['reply_to_message']['text']; }
 		return NULL;
 	}
 
-	function text($clean = FALSE){
+	public function text($clean = FALSE){
 		$text = @$this->data[$this->key]['text'];
 		if($this->key == "callback_query"){
 			$text = @$this->data[$this->key]['data'];
@@ -175,26 +175,26 @@ class Receiver {
 		return $text;
 	}
 
-	function text_query(){
+	public function text_query(){
 		if($this->key != "inline_query"){ return FALSE; }
 		$text = $this->data[$this->key]['query'];
 		if(empty($text)){ $text = NULL; }
 		return $text;
 	}
 
-	function text_query_has($input, $next_word = NULL, $position = NULL){
+	public function text_query_has($input, $next_word = NULL, $position = NULL){
 		$text = $this->text_query();
 		if(empty($text)){ return FALSE; }
 		return $this->text_has($input, $next_word, $position, $text, TRUE);
 	}
 
-	function text_encoded($clean_quotes = FALSE){
+	public function text_encoded($clean_quotes = FALSE){
 		$t = json_encode($this->text(FALSE));
 		if($clean_quotes){ $t = substr($t, 1, -1); }
 		return $t;
 	}
 
-	function text_contains($input, $strpos = NULL){
+	public function text_contains($input, $strpos = NULL){
 		if(!is_array($input)){ $input = array($input); }
 		$text = strtolower($this->text());
 		$text = str_replace(["á", "é", "í", "ó", "ú"], ["a", "e", "i", "o", "u"], $text); // HACK
@@ -224,7 +224,7 @@ class Receiver {
 		return $input;
 	}
 
-	function text_has($input, $next_word = NULL, $position = NULL, $text = NULL, $cleanup = TRUE){
+	public function text_has($input, $next_word = NULL, $position = NULL, $text = NULL, $cleanup = TRUE){
 		// A diferencia de text_contains, esto no será valido si la palabra no es la misma.
 		// ($input = "fanta") -> fanta OK , fanta! OK , fantasma KO
 		if(!is_array($input)){ $input = array($input); }
@@ -232,14 +232,14 @@ class Receiver {
 
 		$input = implode("|", $input);
 		$input = $this->text_cleanup_prepare($input, TRUE);
-        $input = str_replace("/", "\/", $input); // CHANGED fix para escapar comandos y demás.
+		$input = str_replace("/", "\/", $input); // CHANGED fix para escapar comandos y demás.
 
 		if(is_bool($next_word)){ $position = $next_word; $next_word = NULL; }
 		elseif($next_word !== NULL){
 			if(!is_array($next_word)){ $next_word = array($next_word); }
 			$next_word = implode("|", $next_word);
 			$next_word = $this->text_cleanup_prepare($next_word, TRUE);
-            $next_word = str_replace("/", "\/", $next_word); // CHANGED
+			$next_word = str_replace("/", "\/", $next_word); // CHANGED
 		}
 
 		// Al principio de frase
@@ -265,7 +265,7 @@ class Receiver {
 	}
 
 	// WIP TODO
-	function text_has_emoji($emoji = NULL, $return = FALSE){
+	public function text_has_emoji($emoji = NULL, $return = FALSE){
 		if(empty($emoji)){
 			return (strpos($this->text_encoded(), '\u') !== FALSE);
 		}elseif(is_array($emoji)){
@@ -281,7 +281,7 @@ class Receiver {
 		return (strpos($text, $emoji) !== FALSE);
 	}
 
-	function text_regex($expr, $cleanup = TRUE){
+	public function text_regex($expr, $cleanup = TRUE){
 		if(!is_array($expr)){ $expr = [$expr]; }
 		$text = $this->text();
 		if($cleanup){
@@ -317,7 +317,7 @@ class Receiver {
 		return FALSE;
 	}
 
-	function text_mention($user = NULL){
+	public function text_mention($user = NULL){
 		// Incluye users registrados y anónimos.
 		// NULL -> decir si hay usuarios mencionados o no (T/F)
 		// TRUE -> array [ID => @nombre o nombre]
@@ -350,7 +350,7 @@ class Receiver {
 		return FALSE;
 	}
 
-	function text_email($email = NULL){
+	public function text_email($email = NULL){
 		// NULL -> saca el primer mail o FALSE.
 		// TRUE -> array [emails]
 		// STR -> email definido.
@@ -366,7 +366,7 @@ class Receiver {
 		return FALSE;
 	}
 
-	function text_command($cmd = NULL, $begin = TRUE){
+	public function text_command($cmd = NULL, $begin = TRUE){
 		// NULL -> saca el primer comando o FALSE.
 		// TRUE -> array [comandos]
 		// STR -> comando definido.
@@ -407,7 +407,7 @@ class Receiver {
 		return FALSE;
 	}
 
-	function text_hashtag($tag = NULL){
+	public function text_hashtag($tag = NULL){
 		// NULL -> saca el primer hashtag o FALSE.
 		// TRUE -> array [hashtags]
 		// STR -> hashtag definido.
@@ -426,7 +426,7 @@ class Receiver {
 		return FALSE;
 	}
 
-	function text_url($cmd = NULL){
+	public function text_url($cmd = NULL){
 		// NULL -> saca la primera URL o FALSE.
 		// TRUE -> array [URLs]
 		if(empty($this->entities)){ return FALSE; }
@@ -440,13 +440,13 @@ class Receiver {
 		return FALSE;
 	}
 
-	function last_word($clean = FALSE){
+	public function last_word($clean = FALSE){
 		$text = $this->words(TRUE);
 		if($clean === TRUE){ $clean = 'alphanumeric-accent'; }
 		return $this->clean($clean, array_pop($text));
 	}
 
-	function words($position = NULL, $amount = 1, $filter = FALSE){ // Contar + recibir argumentos
+	public function words($position = NULL, $amount = 1, $filter = FALSE){ // Contar + recibir argumentos
 		if($position === NULL){
 			return count(explode(" ", $this->text()));
 		}elseif($position === TRUE){
@@ -465,7 +465,7 @@ class Receiver {
 		}
 	}
 
-	function word_position($find){
+	public function word_position($find){
 		$text = $this->text();
 		if(empty($text)){ return FALSE; }
 		$pos = strpos($text, $find);
@@ -474,7 +474,7 @@ class Receiver {
 		return count(explode(" ", $text));
 	}
 
-	function clean($pattern = 'alphanumeric-full', $text = NULL){
+	public function clean($pattern = 'alphanumeric-full', $text = NULL){
 		$pats = [
 			'number' => '/^[0-9]+/',
 			'number-calc' => '/^([+-]?)\d+(([\.,]?)\d+?)/',
@@ -498,7 +498,7 @@ class Receiver {
 	 *  string date = diff date - Telegram timestamp.
 	 *  string date_format = return specified date format.
 	 */
-	function date($parse = NULL, $time = NULL){
+	public function date($parse = NULL, $time = NULL){
 		if(empty($time)){ $time = $this->timestamp; }
 		if(empty($time)){ $time = time(); } // TEMP HACK Si no hay timestamp.
 
@@ -519,9 +519,9 @@ class Receiver {
 		}
 	}
 
-	function progressbar($val, $max = 100, $chars = 12, $chfull = NULL, $chempty = NULL){
-		$chfull  = (empty($chfull) ? json_decode('"\u2588"') : $this->emoji($chfull));
-		$chempty = (empty($chempty) ? json_decode('"\u2592"') : $this->emoji($chempty));
+	public function progressbar($val, $max = 100, $chars = 12, $chfull = NULL, $chempty = NULL){
+		$chfull  = (empty($chfull) ? "\u{2588}" : $this->emoji($chfull));
+		$chempty = (empty($chempty) ? "\u{2592}" : $this->emoji($chempty));
 
 		$nfull = floor(($val / $max) * $chars);
 		if($nfull < 0){ $nfull = 0; }
@@ -534,8 +534,8 @@ class Receiver {
 		return $str;
 	}
 
-	function is_chat_group(){ return isset($this->chat->type) && in_array($this->chat->type, ["group", "supergroup"]); }
-	function data_received($expect = NULL){
+	public function is_chat_group(){ return isset($this->chat->type) && in_array($this->chat->type, ["group", "supergroup"]); }
+	public function data_received($expect = NULL){
 		if($expect !== NULL){
 			return (isset($this->data[$this->key][$expect]));
 		}
@@ -552,14 +552,14 @@ class Receiver {
 		return FALSE;
 	}
 
-	function forward_type($expect = NULL){
+	public function forward_type($expect = NULL){
 		if(!$this->has_forward){ return FALSE; }
 		$type = $this->data['message']['forward_from_chat']['type'];
 		if($expect !== NULL){ return (strtolower($expect) == $type); }
 		return $type;
 	}
 
-	function is_bot($user = NULL){
+	public function is_bot($user = NULL){
 		if($user === NULL){ $user = $this->user->username; }
 		elseif($user === TRUE && $this->has_reply){ $user = $this->reply_user->username; }
 		elseif($user instanceof User){ $user = $user->username; }
@@ -569,7 +569,7 @@ class Receiver {
 	}
 
 	// NOTE: Solo funcionará si el bot está en el grupo.
-	function user_in_chat(&$user, $chat = NULL, $object = FALSE){
+	public function user_in_chat(&$user, $chat = NULL, $object = FALSE){
 		if($chat === TRUE){ $object = TRUE; $chat = NULL; }
 		if(empty($chat)){ $chat = $this->chat; }
 		if($chat instanceof Chat){ $chat = $chat->id; }
@@ -588,7 +588,7 @@ class Receiver {
 	}
 
 	// TODO Join function and deprecate
-	function grouplink($text, $url = FALSE){
+	public function grouplink($text, $url = FALSE){
 		$link = "https://t.me/";
 		if($text[0] != "@" and strlen($text) == 22){
 			$link .= "joinchat/$text";
@@ -599,21 +599,21 @@ class Receiver {
 		return $link;
 	}
 
-	function get_chat_link($chat = NULL){
+	public function get_chat_link($chat = NULL){
 		if(empty($chat)){ $chat = $this->chat->id; }
 		return $this->send->get_chat_link($chat);
 	}
 
-	function answer_if_callback($text = "", $alert = FALSE){
+	public function answer_if_callback($text = "", $alert = FALSE){
 		if($this->key != "callback_query"){ return FALSE; }
 		return $this->send
 			->text($text)
 		->answer_callback($alert);
 	}
 
-	function dump($json = FALSE){ return($json ? json_encode($this->data) : $this->data); }
+	public function dump($json = FALSE){ return($json ? json_encode($this->data) : $this->data); }
 
-	function get_admins($chat = NULL, $full = FALSE){
+	public function get_admins($chat = NULL, $full = FALSE){
 		$ret = array();
 		if(empty($chat)){ $chat = $this->chat->id; }
 		$admins = $this->send->get_admins($chat);
@@ -623,7 +623,7 @@ class Receiver {
 		return ($full == TRUE ? $admins : $ret);
 	}
 
-	function data($type, $object = TRUE){
+	public function data($type, $object = TRUE){
 		$accept = ["text", "audio", "video", "video_note", "document", "photo", "voice", "location", "contact"];
 		$type = strtolower($type);
 		if(in_array($type, $accept) && isset($this->data['message'][$type])){
@@ -633,7 +633,7 @@ class Receiver {
 		return FALSE;
 	}
 
-	function _generic_content($key, $object = NULL, $rkey = 'file_id'){
+	public function _generic_content($key, $object = NULL, $rkey = 'file_id'){
 		if(!isset($this->data[$this->key][$key])){ return FALSE; }
 		$data = $this->data[$this->key][$key];
 		if(empty($data)){ return FALSE; }
@@ -644,23 +644,23 @@ class Receiver {
 		return $data[$rkey];
 	}
 
-	function document($object = TRUE){ return $this->_generic_content('document', $object); }
-	function location($object = TRUE){ return $this->_generic_content('location', $object); }
-	function audio($object = NULL){ return $this->_generic_content('audio', $object); }
-	function voice($object = NULL){ return $this->_generic_content('voice', $object); }
- 	function video($object = NULL){ return $this->_generic_content('video', $object); }
-	function video_note($object = NULL){ return $this->_generic_content('video_note', $object); }
-	function sticker($object = NULL){ return $this->_generic_content('sticker', $object); }
-	function game($object = TRUE){ return $this->_generic_content('game', $object); }
+	public function document($object = TRUE){ return $this->_generic_content('document', $object); }
+	public function location($object = TRUE){ return $this->_generic_content('location', $object); }
+	public function audio($object = NULL){ return $this->_generic_content('audio', $object); }
+	public function voice($object = NULL){ return $this->_generic_content('voice', $object); }
+ 	public function video($object = NULL){ return $this->_generic_content('video', $object); }
+	public function video_note($object = NULL){ return $this->_generic_content('video_note', $object); }
+	public function sticker($object = NULL){ return $this->_generic_content('sticker', $object); }
+	public function game($object = TRUE){ return $this->_generic_content('game', $object); }
 
-	function gif(){
+	public function gif(){
 		$gif = $this->document(TRUE);
 		if(!$gif or !in_array($gif->mime_type, ["video/mp4"])){ return FALSE; }
 		// TODO gif viene por size?
 		return $gif->file_id;
 	}
 
-	function photo($retall = FALSE, $sel = -1){
+	public function photo($retall = FALSE, $sel = -1){
 		if(!isset($this->data['message']['photo'])){ return FALSE; }
 		$photos = $this->data['message']['photo'];
 		if(empty($photos)){ return FALSE; }
@@ -671,7 +671,7 @@ class Receiver {
 		elseif($retall === TRUE){ return (object) $photos[$sel]; }
 	}
 
-	function contact($self = FALSE, $object = TRUE){
+	public function contact($self = FALSE, $object = TRUE){
 		$contact = $this->data['message']['contact'];
 		if(empty($contact)){ return FALSE; }
 		if(
@@ -685,7 +685,7 @@ class Receiver {
 		}
 	}
 
-	function reply_target($priority = NULL){
+	public function reply_target($priority = NULL){
 		if(!$this->has_reply){ return NULL; }
 		// El reply puede ser hacia la persona del mensaje al cual se hace reply
 		// o si es un forward, hacia ese usuario creador del mensaje.
@@ -701,13 +701,13 @@ class Receiver {
 	}
 
 	// Return UserID siempre que sea posible.
-	function user_selector($priority = NULL, $word = NULL){
+	public function user_selector($priority = NULL, $word = NULL){
 		$user = $this->reply_target($priority);
 		if(!empty($user)){ return $user->id; }
 		// TODO
 	}
 
-	function pinned_message($content = NULL){
+	public function pinned_message($content = NULL){
 		if(!isset($this->data['message']['pinned_message'])){ return FALSE; }
 		$pin = $this->data['message']['pinned_message'];
 		if($content === NULL){
@@ -724,7 +724,7 @@ class Receiver {
 		elseif($content === FALSE){  }
 	}
 
-	function user_can($action = NULL, $user = NULL, $chat = NULL){
+	public function user_can($action = NULL, $user = NULL, $chat = NULL){
 		if(empty($user)){ $user = $this->user->id; }
 		if(empty($chat)){ $chat = $this->chat->id; }
 		$data = $this->send->get_member_info($user, $chat);
@@ -755,7 +755,7 @@ class Receiver {
 		return (bool) $data['result'][$action];
 	}
 
-	function download($file_id, $path = NULL){
+	public function download($file_id, $path = NULL){
 		$data = $this->send->get_file($file_id);
 		$url = "https://api.telegram.org/file/bot" .$this->bot->id .":" .$this->bot->key ."/";
 		$file = $url .$data['file_path'];
@@ -765,7 +765,7 @@ class Receiver {
 		return $file;
 	}
 
-	function emoji($text, $reverse = FALSE){
+	public function emoji($text, $reverse = FALSE){
 		// Load when used
 		if(empty($this->emojis)){
 			$this->emojis = require 'Emojis.php';

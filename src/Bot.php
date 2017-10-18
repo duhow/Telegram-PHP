@@ -5,7 +5,7 @@ namespace Telegram;
 class Bot extends User {
 	public $key = NULL;
 
-	function __construct($id, $key = NULL, $username = NULL, $first_name = NULL){
+	public function __construct($id, $key = NULL, $username = NULL, $first_name = NULL){
 		if(is_array($id) && count($id) == 2){
 			if(empty($first_name) && !empty($username) && !empty($key)){
 				$first_name = $username;
@@ -33,12 +33,12 @@ class Bot extends User {
 		return parent::__construct($id, $first_name, NULL, $username, NULL, TRUE);
 	}
 
-	/* function info(){
+	/* public function info(){
 		$send = new Sender($this);
 		// TODO getWebhookInfo and return array with data
 	} */
 
-	function __toString(){
+	public function __toString(){
 		return ("@" .$this->username);
 	}
 }

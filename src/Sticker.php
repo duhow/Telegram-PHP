@@ -8,11 +8,11 @@ class Sticker {
 	private $file_id;
 	private $user = NULL;
 
-	function __construct($parent){
+	public function __construct($parent){
 		$this->parent = $parent;
 	}
 
-	function get_set($name){
+	public function get_set($name){
 		return $this->parent
 			->_push_method("getStickerSet")
 			->_push('name', $name)
@@ -20,7 +20,7 @@ class Sticker {
 	}
 
 	// user = ID or TRUE to get file_id
-	function upload($file, $user = NULL){
+	public function upload($file, $user = NULL){
 		$retid = FALSE;
 		if($user === TRUE){
 			$retid = TRUE; $user = NULL;
@@ -44,7 +44,7 @@ class Sticker {
 		return $this;
 	}
 
-	function delete($file = NULL){
+	public function delete($file = NULL){
 		if(empty($file) and !empty($this->file_id)){
 			$file = $this->file_id;
 		}elseif(empty($file)){
