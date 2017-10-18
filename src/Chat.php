@@ -70,6 +70,8 @@ class Chat extends User {
 	public function link($bot = NULL){
 		if(isset($this->username) and !empty($this->username)){
 			return "https://t.me/" .$this->username;
+		}elseif(isset($this->invite_link) and !empty($this->invite_link)){
+			return $this->invite_link;
 		}
 		$send = new Sender($bot);
 		return $send->get_chat_link($this->id);

@@ -721,7 +721,7 @@ class Receiver {
 			);
 		}
 		elseif($content === TRUE){ return $pin['text']; }
-		elseif($content === FALSE){  }
+		elseif($content === FALSE){ return $this->send->pin_message(FALSE); }
 	}
 
 	public function user_can($action = NULL, $user = NULL, $chat = NULL){
