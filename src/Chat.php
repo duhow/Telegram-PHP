@@ -106,7 +106,7 @@ class Chat extends User {
 
 	public function __toString(){
 		if($this->type != "private"){ return  $this->title; } // Group or channel
-		return ($this->first_name ." " .$this->last_name); // User
+		return trim($this->first_name ." " .$this->last_name); // User
 	}
 }
 

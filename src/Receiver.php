@@ -47,6 +47,8 @@ class Receiver {
 	public $send = FALSE; // Class
 	public $migrate_chat = NULL;
 	public $input = NULL; // Text Regex Match
+	public $author_signature = NULL;
+	public $forward_signature = NULL;
 	public $emojis = array();
 
 	private function set_access($uid, $key = NULL, $name = NULL){
@@ -97,6 +99,7 @@ class Receiver {
 						if(isset($this->data[$this->key]['reply_to_message']['forward_from_chat'])){
 							$this->reply->forward_from_chat = new Chat($this->data[$this->key]['reply_to_message']['forward_from_chat']);
 						}
+						$this->forward_signature = $this->data[$this->key]['reply_to_message']['forward_signature'];
 					}
 				}
 				if(isset($this->data[$this->key]['forward_from']) or isset($this->data[$this->key]['forward_from_chat'])){
@@ -283,6 +286,7 @@ class Receiver {
 
 	public function text_regex($expr, $cleanup = TRUE){
 		if(!is_array($expr)){ $expr = [$expr]; }
+		if(empty($expr)){ return FALSE; }
 		$text = $this->text();
 		if($cleanup){
 			$vowels = [
@@ -577,6 +581,7 @@ class Receiver {
 		$uid = $user;
 		if($user instanceof User){ $uid = $user->id; }
 		$info = $this->send->get_member_info($uid, $chat);
+		if($info !== FALSE){ $info['user'] = new User($info['user']); }
 		$ret = ($object ? (object) $info : $info);
 
 		// TODO CHECK DATA
@@ -597,6 +602,14 @@ class Receiver {
 			else{ $link = $text; }
 		}
 		return $link;
+	}
+
+	public function userlink($user, $text = NULL, $html = TRUE){
+		if($user instanceof User){ $user = $user->id; }
+		$link = "tg://user?id=" .$user;
+		if(empty($text)){ return $link; }
+		if($html){ return '<a href="' .$link .'">' .$text .'</a>'; }
+		return '[' .$text .'](' .$link .')';
 	}
 
 	public function get_chat_link($chat = NULL){

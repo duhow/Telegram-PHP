@@ -58,7 +58,7 @@ class User {
 	}
 
 	public function __toString(){
-		return $this->first_name ." " .$this->last_name;
+		return trim($this->first_name ." " .$this->last_name);
 	}
 
 	public function __get($k){
