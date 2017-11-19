@@ -359,9 +359,25 @@ class Sender {
 	public function ban($user = NULL, $chat = NULL, $keep = FALSE){ return $this->_parse_generic_chatFunctions("kickChatMember", $keep, $chat, $user); }
 	public function unban($user = NULL, $chat = NULL, $keep = FALSE){ return $this->_parse_generic_chatFunctions("unbanChatMember", $keep, $chat, $user); }
 	public function leave_chat($chat = NULL, $keep = FALSE){ return $this->_parse_generic_chatFunctions("leaveChat", $keep, $chat); }
-	public function get_chat($chat = NULL, $keep = FALSE){ return $this->_parse_generic_chatFunctions("getChat", $keep, $chat); }
-	public function get_admins($chat = NULL, $keep = FALSE){ return $this->_parse_generic_chatFunctions("getChatAdministrators", $keep, $chat); }
-	public function get_member_info($user = NULL, $chat = NULL, $keep = FALSE){ return $this->_parse_generic_chatFunctions("getChatMember", $keep, $chat, $user); }
+	public function get_chat($chat = NULL, $keep = FALSE){
+		$res = $this->_parse_generic_chatFunctions("getChat", $keep, $chat);
+		if($res !== FALSE){ $res['user'] = new User($res['user']); }
+		return $res;
+	}
+	public function get_admins($chat = NULL, $keep = FALSE){
+		$res = $this->_parse_generic_chatFunctions("getChatAdministrators", $keep, $chat);
+		if($res !== FALSE){
+			foreach($res as $k => $data){
+				$res[$k]['user'] = new User($data['user']);
+			}
+		}
+		return $res;
+	}
+	public function get_member_info($user = NULL, $chat = NULL, $keep = FALSE){
+		$res = $this->_parse_generic_chatFunctions("getChatMember", $keep, $chat, $user);
+		if($res !== FALSE){ $res['user'] = new User($res['user']); }
+		return $res;
+	}
 	public function get_members_count($chat = NULL, $keep = FALSE){ return $this->_parse_generic_chatFunctions("getChatMembersCount", $keep, $chat); }
 	public function get_chat_link($chat = NULL, $keep = FALSE){ return $this->_parse_generic_chatFunctions("exportChatInviteLink", $keep, $chat); }
 	public function get_user_avatar($user = NULL, $offset = NULL, $limit = 100){

@@ -231,6 +231,7 @@ class Receiver {
 		// A diferencia de text_contains, esto no será valido si la palabra no es la misma.
 		// ($input = "fanta") -> fanta OK , fanta! OK , fantasma KO
 		if(!is_array($input)){ $input = array($input); }
+		if(empty($input)){ return FALSE; }
 		// FIXME si algun input contiene un PIPE | , ya me ha jodio. Controlarlo.
 
 		$input = implode("|", $input);
@@ -566,7 +567,10 @@ class Receiver {
 	public function is_bot($user = NULL){
 		if($user === NULL){ $user = $this->user->username; }
 		elseif($user === TRUE && $this->has_reply){ $user = $this->reply_user->username; }
-		elseif($user instanceof User){ $user = $user->username; }
+		elseif($user instanceof User){
+			if($user->is_bot){ return $user->is_bot; }
+			$user = $user->username;
+		}
 		return (!empty($user) && substr(strtolower($user), -3) == "bot");
 		// TODO Si realmente es un bot y se intenta hacer un chatAction, no debería dejar.
 		// A no ser que ese usuario también haya bloqueado al bot.
@@ -581,7 +585,6 @@ class Receiver {
 		$uid = $user;
 		if($user instanceof User){ $uid = $user->id; }
 		$info = $this->send->get_member_info($uid, $chat);
-		if($info !== FALSE){ $info['user'] = new User($info['user']); }
 		$ret = ($object ? (object) $info : $info);
 
 		// TODO CHECK DATA
@@ -631,7 +634,7 @@ class Receiver {
 		if(empty($chat)){ $chat = $this->chat->id; }
 		$admins = $this->send->get_admins($chat);
 		if(!empty($admins)){
-			foreach($admins as $a){	$ret[] = $a['user']['id']; }
+			foreach($admins as $a){	$ret[] = $a['user']->id; }
 		}
 		return ($full == TRUE ? $admins : $ret);
 	}

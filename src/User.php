@@ -53,8 +53,12 @@ class User {
 		return $this->__construct($info);
 	}
 
-	public function link(){
-		return "tg://user?id=" .$this->id;
+	public function link($text = NULL, $html = TRUE){
+		$url = "tg://user?id=" .$this->id;
+		if($text === NULL){ return $url; }
+		if($text === TRUE){ $text = strval($this); }
+		if($html){ return '<a href="' .$url .'">' .$text .'</a>'; }
+		return '[' .$text .'](' .$url .')';
 	}
 
 	public function __toString(){
