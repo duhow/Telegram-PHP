@@ -375,11 +375,11 @@ class Receiver {
 		// NULL -> saca el primer comando o FALSE.
 		// TRUE -> array [comandos]
 		// STR -> comando definido.
-		// $begin = si es comando inicial
+		// $begin -> si es comando inicial
+		// $begin STR -> si es comando con ese parametro
 		if(empty($this->entities)){ return FALSE; }
 		if($cmd === FALSE){ $begin = FALSE; $cmd = NULL; }
 		$cmds = array();
-		$text = $this->text(FALSE); // No UTF-8 clean
 		$initbegin = FALSE;
 		foreach($this->entities as $e){
 			if($e->type == 'bot_command'){
@@ -389,7 +389,7 @@ class Receiver {
 		}
 		if($cmd == NULL){
 			if(count($cmds) > 0){
-				if($begin && !$initbegin){ return FALSE; }
+				if($begin === TRUE && !$initbegin){ return FALSE; }
 				return $cmds[0];
 			}
 			return FALSE;
@@ -400,13 +400,28 @@ class Receiver {
 			foreach($cmd as $csel){
 				if($csel[0] != "/"){ $csel = "/" .$csel; }
 				$csel = strtolower($csel);
-				if(in_array($csel, $cmds) && strpos($csel, "@") === FALSE){ return !($begin && !$initbegin); }
+				if(in_array($csel, $cmds) && strpos($csel, "@") === FALSE){
+					if(is_string($begin)){
+						if(!$initbegin){ return FALSE; } // Only commands at begin
+						$text = strtolower($this->text(FALSE)); // No UTF-8 clean
+						return (preg_match('/^\\' ."$csel $begin" .'($|\s\w+)/i', $text));
+					}
+					return !($begin && !$initbegin);
+				}
+				// Add with bot name
 				$name = strtolower($this->bot->username);
 				if($name){
 					if($name[0] != "@"){ $name = "@" .$name; }
 					$csel = $csel.$name;
 				}
-				if(in_array($csel, $cmds)){ return !($begin && !$initbegin); }
+				if(in_array($csel, $cmds)){
+					if(is_string($begin)){
+						if(!$initbegin){ return FALSE; } // Only commands at begin
+						$text = strtolower($this->text(FALSE)); // No UTF-8 clean
+						return (preg_match('/^\\' ."$csel $begin" .'($|\s\w+)/i', $text));
+					}
+					return !($begin && !$initbegin);
+				}
 			}
 		}
 		return FALSE;
