@@ -36,6 +36,7 @@ class Receiver {
 	public $new_users = array();
 	public $left_user = NULL;
 	public $reply_user = NULL;
+	public $forward_user = NULL;
 	public $has_reply = FALSE;
 	public $has_forward = FALSE;
 	public $is_edit = FALSE;
@@ -96,6 +97,9 @@ class Receiver {
 					$this->reply_is_forward = (isset($this->data[$this->key]['reply_to_message']['forward_from']));
 					if($this->reply_is_forward){
 						$this->reply->forward_from = new User($this->data[$this->key]['reply_to_message']['forward_from']);
+						// No se puede hacer reply a un forward con otro forward,
+						// por lo que no hay problema en hacer esto.
+						$this->forward_user = new User($this->data[$this->key]['reply_to_message']['forward_from']);
 						if(isset($this->data[$this->key]['reply_to_message']['forward_from_chat'])){
 							$this->reply->forward_from_chat = new Chat($this->data[$this->key]['reply_to_message']['forward_from_chat']);
 						}
@@ -104,6 +108,9 @@ class Receiver {
 				}
 				if(isset($this->data[$this->key]['forward_from']) or isset($this->data[$this->key]['forward_from_chat'])){
 					$this->has_forward = TRUE;
+					if(isset($this->data[$this->key]['forward_from'])){
+						$this->forward_user = new User($this->data[$this->key]['forward_from']);
+					}
 				}
 				if(isset($this->data[$this->key]['new_chat_members'])){
 					foreach($this->data[$this->key]['new_chat_members'] as $user){
