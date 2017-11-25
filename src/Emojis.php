@@ -94,7 +94,7 @@
 ':man_judge:' => "\u{1f468}\u{200d}\u{2696}\u{fe0f}",
 ':man_juggling:' => "\u{1f939}\u{200d}\u{2642}\u{fe0f}",
 ':man_lifting_weights:' => "\u{1f3cb}\u{fe0f}",
-':man_mage:' => "\u{1f9d9}\u{200d}\u{2642}\u{fe0f}"
+':man_mage:' => "\u{1f9d9}\u{200d}\u{2642}\u{fe0f}",
 ':man_mechanic:' => "\u{1f468}\u{200d}\u{1f527}",
 ':man_mountain_biking:' => "\u{1f6b5}",
 ':man_office_worker:' => "\u{1f468}\u{200d}\u{1f4bc}",
@@ -145,7 +145,7 @@
 ':woman_judge:' => "\u{1f469}\u{200d}\u{2696}\u{fe0f}",
 ':woman_juggling:' => "\u{1f939}\u{200d}\u{2640}\u{fe0f}",
 ':woman_lifting_weights:' => "\u{1f3cb}\u{fe0f}\u{200d}\u{2640}\u{fe0f}",
-':woman_mage:' => "\u{1f9d9}\u{200d}\u{2640}\u{fe0f}"
+':woman_mage:' => "\u{1f9d9}\u{200d}\u{2640}\u{fe0f}",
 ':woman_mechanic:' => "\u{1f469}\u{200d}\u{1f527}",
 ':woman_mountain_biking:' => "\u{1f6b5}\u{200d}\u{2640}\u{fe0f}",
 ':woman_office_worker:' => "\u{1f469}\u{200d}\u{1f4bc}",
