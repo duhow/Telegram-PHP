@@ -207,9 +207,9 @@ class Receiver {
 	public function text_contains($input, $strpos = NULL){
 		if(!is_array($input)){ $input = array($input); }
 		$text = strtolower($this->text());
-		$text = str_replace(["á", "é", "í", "ó", "ú"], ["a", "e", "i", "o", "u"], $text); // HACK
+		$text = $this->text_cleanup_prepare($text, FALSE);
 		foreach($input as $i){
-			$j = str_replace(["á", "é", "í", "ó", "ú"], ["a", "e", "i", "o", "u"], $i); // HACK
+			$j = $this->text_cleanup_prepare($i, FALSE);
 			if(
 				($strpos === NULL and strpos($text, strtolower($j)) !== FALSE) or // Buscar cualquier coincidencia
 				($strpos === TRUE and strpos($text, strtolower($j)) === 0) or // Buscar textualmente eso al principio
@@ -226,7 +226,9 @@ class Receiver {
 		if($tolower){ $input = strtolower($input); }
 		$vocals = [
 			"á" => "a", "é" => "e", "í" => "i", "ó" => "o", "ú" => "u",
+			"à" => "a", "è" => "e", "ì" => "i", "ò" => "o", "ù" => "u",
 			"Á" => "A", "É" => "E", "Í" => "I", "Ó" => "O", "Ú" => "U"
+			"À" => "A", "È" => "E", "Ì" => "I", "Ò" => "O", "Ù" => "U"
 		];
 		$input = str_replace(array_keys($vocals), array_values($vocals), $input);
 		$input = str_replace("%20", " ", $input); // HACK web
@@ -296,14 +298,7 @@ class Receiver {
 		if(!is_array($expr)){ $expr = [$expr]; }
 		if(empty($expr)){ return FALSE; }
 		$text = $this->text();
-		if($cleanup){
-			$vowels = [
-				"á" => "a", "é" => "e", "í" => "i", "ó" => "o", "ú" => "u",
-				"Á" => "A", "É" => "E", "Í" => "I", "Ó" => "O", "Ú" => "U",
-				"%20" => " " // HACK
-			];
-			$text = str_replace(array_keys($vowels), array_values($vowels), $text);
-		}
+		if($cleanup){ $text = $this->text_cleanup_prepare($text, FALSE); }
 		$repls = [
 			'/\{N:(\w+)\}/i' => '(?P<$1>[\\d]+)',
 			'/\{S:(\w+)\}/i' => '(?P<$1>[\\w\\s?]+)',
@@ -506,10 +501,10 @@ class Receiver {
 			'number' => '/^[0-9]+/',
 			'number-calc' => '/^([+-]?)\d+(([\.,]?)\d+?)/',
 			'alphanumeric' => '/[^a-zA-Z0-9]+/',
-			'alphanumeric-accent' => '/[^a-zA-Z0-9áéíóúÁÉÍÓÚ]+/',
+			'alphanumeric-accent' => '/[^a-zA-Z0-9áéíóúÁÉÍÓÚàèìòùÀÈÌÒÙ]+/',
 			'alphanumeric-symbols-basic' => '/[^a-zA-Z0-9\._\-]+/',
-			'alphanumeric-full' => '/[^a-zA-Z0-9áéíóúÁÉÍÓÚ\._\-]+/',
-			'alphanumeric-full-spaces' => '/[^a-zA-Z0-9áéíóúÁÉÍÓÚ\.\s_\-]+/',
+			'alphanumeric-full' => '/[^a-zA-Z0-9áéíóúÁÉÍÓÚàèìòùÀÈÌÒÙ\._\-]+/',
+			'alphanumeric-full-spaces' => '/[^a-zA-Z0-9áéíóúÁÉÍÓÚàèìòùÀÈÌÒÙ\.\s_\-]+/',
 		];
 		if(empty($text)){ $text = $this->text(); }
 		if($pattern == FALSE){ return $text; }
