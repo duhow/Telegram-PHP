@@ -223,6 +223,10 @@
 ':point_down:' => "\u{1f447}",
 ':point_right:' => "\u{1f449}",
 ':point_left:' => "\u{1f448}",
+':thumbup:' => "\u{d83d}\u{dc4d}",
+':thumbsup:' => "\u{d83d}\u{dc4d}",
+':thumbdown:' => "\u{d83d}\u{dc4e}",
+':thumbsdown:' => "\u{d83d}\u{dc4e}",
 ':raised_hands:' => "\u{1f64c}",
 ':pray:' => "\u{1f64f}",
 ':point_up:' => "\u{261d}",
@@ -292,6 +296,7 @@
 ':gem:' => "\u{1f48e}",
 ':bust_in_silhouette:' => "\u{1f464}",
 ':busts_in_silhouette:' => "\u{1f465}",
+':speaking_head_in_silhouette:' => "\u{1f5e3}",
 ':speech_balloon:' => "\u{1f4ac}",
 ':footprints:' => "\u{1f463}",
 ':thought_balloon:' => "\u{1f4ad}",
@@ -515,6 +520,7 @@
 ':postbox:' => "\u{1f4ee}",
 ':package:' => "\u{1f4e6}",
 ':memo:' => "\u{1f4dd}",
+':pencil:' => "\u{1f4dd}",
 ':page_facing_up:' => "\u{1f4c4}",
 ':page_with_curl:' => "\u{1f4c3}",
 ':bookmark_tabs:' => "\u{1f4d1}",
@@ -1211,8 +1217,8 @@
 ':o' => "\u{1f628}", // Fearful
 ':|' => "\u{1f610}", // Neutral face
 '3-)' => "\u{1f60c}", // Relieved
-'>(' => "\u{1f620}", // Angry
-'>((' => "\u{1f621}", // Rage
+// '>(' => "\u{1f620}", // Angry
+// '>((' => "\u{1f621}", // Rage
 'O:)' => "\u{1f607}", // Innocent
 ';o' => "\u{1f630}", // Cold sweat
 '8|' => "\u{1f633}", // Flushed
@@ -1226,7 +1232,7 @@
 '^3^' => "\u{1f619}", // Kissing face with smiling eyes
 ':lol:' => "\u{1f602}", // Joy
 ':\'D' => "\u{1f602}", // Joy
-'>X' => "\u{1f635}", // Dizzy
+// '>X' => "\u{1f635}", // Dizzy
 ':die:' => "\u{1f635}", // Dizzy
 ':sun:' => "\u{2600}",
 
@@ -1316,6 +1322,7 @@
 ':world-asia:' => "\u{1f30f}",
 
 ':love:' => "\u{2764}",
+':red_heart:' => "\u{2764}",
 ':heart-red:' => "\u{2764}",
 ':heart-blue:' => "\u{1f499}",
 ':heart-green:' => "\u{1f49a}",

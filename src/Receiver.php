@@ -295,8 +295,10 @@ class Receiver {
 	}
 
 	public function text_regex($expr, $cleanup = TRUE){
-		if(!is_array($expr)){ $expr = [$expr]; }
-		if(empty($expr)){ return FALSE; }
+		if(!is_array($expr)){
+			if(empty(trim($expr))){ return FALSE; }
+			$expr = [$expr];
+		}
 		$text = $this->text();
 		if($cleanup){ $text = $this->text_cleanup_prepare($text, FALSE); }
 		$repls = [
