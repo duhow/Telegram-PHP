@@ -67,12 +67,17 @@ class Chat extends User {
 		return $send->$action($user, $this->id);
 	}
 
-	public function link($bot = NULL){
+	// TODO Cleanup code
+	public function link($bot = NULL, $html = FALSE){
+		$url = NULL;
 		if(isset($this->username) and !empty($this->username)){
-			return "https://t.me/" .$this->username;
+			$url = "https://t.me/" .$this->username;
 		}elseif(isset($this->invite_link) and !empty($this->invite_link)){
-			return $this->invite_link;
+			$url = $this->invite_link;
 		}
+		if(!$html and $url){ return $url; }
+		elseif($html and $url){ return '<a href="' .$url .'">' . $html .'</a>'; }
+
 		$send = new Sender($bot);
 		return $send->get_chat_link($this->id);
 	}
