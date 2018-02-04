@@ -611,7 +611,17 @@ class Receiver {
 			$user->status = $info['status'];
 		}
 
-		return ( ($info === FALSE or in_array($info['status'], ['left', 'kicked'])) ? FALSE : $ret );
+		if(
+			$info === FALSE or
+			in_array($info['status'], ['left', 'kicked']) or
+			(
+				$info['status'] == 'restricted' and
+				$info['until_date'] == 0 and
+				!$info['can_send_messages']
+			)
+		){ return FALSE; }
+
+		return TRUE;
 	}
 
 	// TODO Join function and deprecate

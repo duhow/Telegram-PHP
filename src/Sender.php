@@ -88,9 +88,13 @@ class Sender {
 		if(filter_var($file, FILTER_VALIDATE_URL) !== FALSE){
 			// ES URL, descargar y enviar.
 			$url = TRUE;
-			$tmp = tempnam("/tmp", "telegram") .substr($file, -4); // .jpg
-			file_put_contents($tmp, fopen($file, 'r'));
-			$file = $tmp;
+			if($caption !== TRUE){
+				$tmp = tempnam("/tmp", "telegram") .substr($file, -4); // .jpg
+				file_put_contents($tmp, fopen($file, 'r'));
+				$file = $tmp;
+			}else{
+				$caption = NULL;
+			}
 		}
 
 		$this->method = "send" .ucfirst(strtolower($type));
