@@ -12,6 +12,7 @@ class Sender {
 	private $language = "en";
 	private $timeout = 0;
 	public  $convert_emoji = TRUE; // Default
+	public  $use_internal_resolver = TRUE;
 	private $_keyboard;
 	private $_inline;
 	private $_payment;
@@ -697,6 +698,17 @@ class Sender {
 		curl_setopt($handle, CURLOPT_RETURNTRANSFER, TRUE);
 		curl_setopt($handle, CURLOPT_CONNECTTIMEOUT, 5);
 		curl_setopt($handle, CURLOPT_TIMEOUT, 60);
+		if($this->use_internal_resolver){
+			$apihosts = [
+			    "149.154.167.197",
+			    "149.154.167.198",
+			    "149.154.167.199",
+			    "149.154.167.200"
+			];
+
+			$apihost = $apihosts[mt_rand(0,count($apihosts) - 1)];
+			curl_setopt($handle, CURLOPT_RESOLVE, ["api.telegram.org:443:$apihost"]);
+		}
 
 		if($post){
 			curl_setopt($handle, CURLOPT_HTTPHEADER, ["Content-Type:multipart/form-data"]);
