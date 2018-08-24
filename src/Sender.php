@@ -82,8 +82,19 @@ class Sender {
 		return $this->send();
 	}
 
+	public function duration($duration){
+		$this->content['duration'] = (int) $duration;
+		return $this;
+	}
+
+	public function resolution($width, $height){
+		$this->content['width'] = (int) $width;
+		$this->content['height'] = (int) $height;
+		return $this;
+	}
+
 	public function file($type, $file, $caption = NULL, $keep = FALSE){
-		if(!in_array($type, ["photo", "chatphoto", "audio", "voice", "document", "sticker", "video", "video_note", "videonote"])){ return FALSE; }
+		if(!in_array($type, ["photo", "chatphoto", "audio", "voice", "document", "animation", "sticker", "video", "video_note", "videonote"])){ return FALSE; }
 
 		$url = FALSE;
 		if(filter_var($file, FILTER_VALIDATE_URL) !== FALSE){
