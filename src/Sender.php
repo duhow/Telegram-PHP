@@ -487,8 +487,13 @@ class Sender {
 		// if(!in_array($type, ['text', 'message', 'caption', 'keyboard', 'inline', 'markup', 'location', 'livelocation'])){ return FALSE; }
 		if(isset($this->content['text']) && in_array($type, ['text', 'message'])){
 			$this->method = "editMessageText";
-		}elseif(isset($this->content['caption']) && $type == "caption"){
+		}elseif($type == "caption"){
 			$this->method = "editMessageCaption";
+			if(array_key_exists('text', $this->content) and !isset($this->content['caption'])){
+				$this->content['caption'] = $this->content['text'];
+				unset($this->content['text']);
+			}
+			if(!isset($this->content['caption'])){ return FALSE; }
 		}elseif(isset($this->content['inline_keyboard']) && in_array($type, ['keyboard', 'inline', 'markup'])){
 			$this->method = "editMessageReplyMarkup";
 		}elseif(isset($this->content['latitude']) && isset($this->content['longitude']) && in_array($type, ['location', 'livelocation'])){
