@@ -483,6 +483,39 @@ class Sender {
 		return $this->send();
 	}
 
+	public function media($type, $media, $extras = NULL){
+		if(!in_array($type, ['photo', 'video', 'animation', 'audio', 'document'])){ return FALSE; }
+		// TODO upload media file
+		$data = [
+			'type' => $type,
+			'media' => $media
+		];
+
+		// Change text to caption
+		if(isset($this->content['text'])){
+			$this->content['caption'] = $this->content['text'];
+			unset($this->content['text']);
+		}
+
+		// Move current set data to media
+		foreach(['caption', 'parse_mode'] as $key){
+			if(isset($this->content[$key])){
+				$data[$key] = $this->content[$key];
+				unset($this->content[$key]);
+			}
+		}
+
+		// Set extra data
+		if(is_array($extras)){
+			foreach($extras as $k => $v){
+				$data[$k] = $v;
+			}
+		}
+
+		$this->content['media'] = $data;
+		return $this;
+	}
+
 	public function edit($type){
 		// if(!in_array($type, ['text', 'message', 'caption', 'keyboard', 'inline', 'markup', 'location', 'livelocation'])){ return FALSE; }
 		if(isset($this->content['text']) && in_array($type, ['text', 'message'])){
@@ -500,6 +533,8 @@ class Sender {
 			$this->method = "editMessageLiveLocation";
 		}elseif(in_array($type, ['location', 'livelocation'])){
 			$this->method = "stopMessageLiveLocation";
+		}elseif($type == 'media'){
+			$this->method = "editMessageMedia";
 		}else{
 			return FALSE;
 		}
