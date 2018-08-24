@@ -533,7 +533,7 @@ class Sender {
 			$this->method = "editMessageLiveLocation";
 		}elseif(in_array($type, ['location', 'livelocation'])){
 			$this->method = "stopMessageLiveLocation";
-		}elseif($type == 'media'){
+		}elseif(isset($this->content['media']) && $type == 'media'){
 			$this->method = "editMessageMedia";
 		}else{
 			return FALSE;
