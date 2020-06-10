@@ -12,7 +12,7 @@ class Sender {
 	private $language = "en";
 	private $timeout = 0;
 	public  $convert_emoji = TRUE; // Default
-	public  $use_internal_resolver = TRUE;
+	public  $use_internal_resolver = FALSE; // DEPRECATED
 	private $_keyboard;
 	private $_inline;
 	private $_payment;
@@ -751,10 +751,7 @@ class Sender {
 		curl_setopt($handle, CURLOPT_TIMEOUT, 60);
 		if($this->use_internal_resolver){
 			$apihosts = [
-			    "149.154.167.197",
-			    "149.154.167.198",
-			    "149.154.167.199",
-			    "149.154.167.200"
+			    "149.154.167.220"
 			];
 
 			$apihost = $apihosts[mt_rand(0,count($apihosts) - 1)];
