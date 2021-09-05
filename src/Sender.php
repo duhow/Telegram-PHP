@@ -135,8 +135,10 @@ class Sender {
 		$output = $this->send("POSTKEEP");
 		if($url === TRUE){ unlink($file); }
 		if($keep === FALSE){ $this->_reset(); }
-		$json = json_decode($output, TRUE);
-		if($json){ return $json['result']; }
+		if(!empty($output) && is_string($output)){
+			$json = json_decode($output, TRUE);
+			if($json){ return $json['result']; }
+		}
 		return $output;
 		// return $this;
 	}
